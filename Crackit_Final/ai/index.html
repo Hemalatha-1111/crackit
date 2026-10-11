@@ -1,0 +1,2478 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrackIT — Placement Preparation</title>
+<script>
+  (function(){
+    try {
+      var theme = '';
+      var match = window.location.search.match(/[?&]theme=([^&]+)/);
+      if (match && match[1]) {
+        theme = decodeURIComponent(match[1]);
+      }
+      if (!theme || theme === 'system') {
+        var uSet = localStorage.getItem('crackit_user_settings');
+        if (uSet) {
+          var parsed = JSON.parse(uSet);
+          if (parsed && parsed.theme) theme = parsed.theme;
+        }
+      }
+      if (!theme || theme === 'system') {
+        theme = localStorage.getItem('crackit-theme') || 'system';
+      }
+      var resolved = theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
+      document.documentElement.setAttribute('data-theme', resolved);
+    } catch(e){}
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#5457D9;
+    --primary-dark:#4448c2;
+    --primary-light:#eceafc;
+    --bg:#f8f9fc;
+    --sidebar-bg:#ffffff;
+    --card-bg:#ffffff;
+    --border:#ebedf3;
+    --text:#15171f;
+    --text-muted:#6b7280;
+    --text-faint:#9aa0ac;
+    --badge-bg:#fdecd6;
+    --badge-text:#b9720f;
+    --track-bg:#eef0f6;
+    --shadow: 0 1px 2px rgba(16,18,30,0.04);
+    --radius-lg:18px;
+    --radius-md:12px;
+    --radius-sm:8px;
+  }
+  html[data-theme="dark"]{
+    --primary:#7276e8;
+    --primary-dark:#8a8dee;
+    --primary-light:#22243a;
+    --bg:#0c0d13;
+    --sidebar-bg:#0c0d13;
+    --card-bg:#14151d;
+    --border:#23252f;
+    --text:#f4f5f8;
+    --text-muted:#9aa0ac;
+    --text-faint:#6b7280;
+    --badge-bg:#3a2c19;
+    --badge-text:#e2a75b;
+    --track-bg:#1c1e28;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    transition:background .2s ease,color .2s ease;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+
+  /* ---------- layout ---------- */
+  .app-shell{display:none;min-height:100vh;}
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    width:260px;
+    flex-shrink:0;
+    background:var(--sidebar-bg);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    padding:24px 18px;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 8px 26px 8px;
+    font-size:19px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+  }
+  .logo .logo-badge{
+    width:36px;height:36px;border-radius:11px;
+    background:var(--primary);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+    color:#fff;
+  }
+  .logo .accent{color:var(--primary);}
+  nav.nav-list{display:flex;flex-direction:column;gap:3px;flex:1;}
+  .nav-item{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 14px;
+    border-radius:11px;
+    font-size:14.5px;
+    font-weight:500;
+    color:var(--text-muted);
+    cursor:pointer;
+    border:none;
+    background:transparent;
+    width:100%;
+    text-align:left;
+  }
+  .nav-item svg{width:19px;height:19px;flex-shrink:0;}
+  .nav-item:hover{background:var(--track-bg);color:var(--text);}
+  .nav-item.active{background:var(--primary);color:#fff;}
+  .sidebar-footer{border-top:1px solid var(--border);padding-top:14px;margin-top:14px;}
+  .logout-btn{color:#e0555f;}
+  .logout-btn:hover{background:rgba(224,85,95,0.1);color:#e0555f;}
+
+  /* ---------- main / topbar ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:14px;
+    padding:18px 32px;
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;background:var(--bg);z-index:20;
+  }
+  .profile-chip{
+    display:flex;align-items:center;gap:9px;
+    padding:6px 12px 6px 6px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    cursor:pointer;
+  }
+  .avatar{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--primary);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;flex-shrink:0;
+  }
+  .profile-chip .name{font-size:14px;font-weight:600;}
+
+  /* ---------- content ---------- */
+  .content{padding:28px 32px 60px;max-width:1180px;width:100%;}
+  .page{display:none;}
+  .page.active{display:block;animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .page-title{font-size:28px;font-weight:800;letter-spacing:-0.02em;margin:0 0 6px;}
+  .page-subtitle{font-size:15px;color:var(--text-muted);margin:0 0 24px;}
+
+  /* welcome banner */
+  .welcome-banner{
+    background:linear-gradient(135deg,var(--primary) 0%, #7376e8 100%);
+    border-radius:var(--radius-lg);
+    padding:36px 40px;
+    color:#fff;
+    margin-bottom:34px;
+  }
+  .welcome-banner h1{font-size:30px;margin:0 0 12px;font-weight:800;letter-spacing:-0.02em;}
+  .welcome-banner p{margin:0 0 22px;font-size:15px;line-height:1.6;max-width:640px;color:rgba(255,255,255,0.92);}
+  .btn-white{
+    background:#fff;color:#15171f;border:none;
+    padding:12px 22px;border-radius:11px;
+    font-size:14.5px;font-weight:700;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-white:hover{background:#f1f1f6;}
+  .banner-caption{margin:14px 0 0;font-size:13px;color:rgba(255,255,255,0.8);}
+
+  .section-title{font-size:19px;font-weight:700;margin:0 0 16px;letter-spacing:-0.01em;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:34px;}
+
+  .prep-card{
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--radius-lg);padding:22px;
+    display:flex;flex-direction:column;
+  }
+  .prep-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+  .icon-circle{
+    width:52px;height:52px;border-radius:50%;
+    background:var(--track-bg);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;
+  }
+  .badge{
+    background:var(--badge-bg);color:var(--badge-text);
+    font-size:12px;font-weight:600;
+    padding:5px 11px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+  }
+  .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--badge-text);}
+  .prep-card h3{font-size:17px;margin:0 0 8px;font-weight:700;}
+  .prep-card p{font-size:13.5px;color:var(--text-muted);line-height:1.55;margin:0 0 20px;flex:1;}
+
+  .btn-primary{
+    background:var(--primary);color:#fff;border:none;
+    padding:12px 18px;border-radius:11px;
+    font-size:14px;font-weight:700;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;
+  }
+  .btn-primary:hover{background:var(--primary-dark);}
+
+  .empty-card{
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:70px 30px;
+    text-align:center;
+  }
+  .empty-card .icon-circle{width:76px;height:76px;font-size:34px;margin:0 auto 22px;}
+  .empty-card h3{font-size:19px;margin:0 0 10px;font-weight:700;}
+  .empty-card p{font-size:14px;color:var(--text-muted);max-width:440px;margin:0 auto 26px;line-height:1.6;}
+
+  /* ---------- official colorful login page (YOUR UI) ---------- */
+  .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#f5f3ff 0%,#eef6ff 50%,#f8fbff 100%)}
+  .login-screen:before,.login-screen:after{content:"";position:absolute;border-radius:50%;pointer-events:none}.login-screen:before{width:430px;height:430px;background:rgba(84,87,217,.16);top:-190px;left:-130px}.login-screen:after{width:390px;height:390px;background:rgba(14,165,233,.13);bottom:-190px;right:-110px}
+  .login-card{position:relative;z-index:1;width:min(460px,100%);background:rgba(255,255,255,.97);border:1px solid rgba(84,87,217,.14);border-radius:26px;padding:38px;box-shadow:0 24px 70px rgba(50,55,120,.16)}
+  .login-brand{display:flex;align-items:center;gap:11px;justify-content:center;margin-bottom:25px;font-size:24px;font-weight:800;color:#17182a}.login-brand .logo-badge{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#5457d9,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 8px 20px rgba(84,87,217,.28);color:#fff;}
+  .login-brand .accent{background:linear-gradient(90deg,#5457d9,#7c3aed);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .login-title{font-size:30px;font-weight:800;text-align:center;margin:0 0 8px;color:#17182a}
+  .login-subtitle{text-align:center;color:#697086;font-size:14px;margin:0 auto 28px;line-height:1.55;max-width:350px}
+  .login-form{display:flex;flex-direction:column;gap:17px}
+  .login-field{display:flex;flex-direction:column;gap:8px}
+  .login-field label{font-size:13px;font-weight:700;color:#34384d}
+  .login-field input{width:100%;padding:14px 15px;border:1px solid #dfe2ec;border-radius:12px;background:#f8f9fd;color:#202336;font:inherit;font-size:14px;outline:none;transition:.2s}
+  .login-field input:focus{background:#fff;border-color:#6266e2;box-shadow:0 0 0 4px rgba(84,87,217,.11)}
+  
+  /* Password Wrapper with Eye Icon */
+  .password-wrapper { position: relative; display: flex; align-items: center; }
+  .password-wrapper input { width: 100%; padding-right: 45px; }
+  .toggle-password {
+    position: absolute; right: 14px; background: none; border: none; cursor: pointer;
+    font-size: 16px; color: #697086; display: flex; align-items: center; justify-content: center; padding: 0;
+  }
+  .toggle-password:hover { color: #5457d9; }
+
+  .auth-btn-container{display:flex;gap:12px;margin-top:10px;}
+  .btn-signin{flex:1;background:linear-gradient(135deg,#5457d9,#7048d9);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 9px 22px rgba(84,87,217,.24);}
+  .btn-create{flex:1;background:#edf2f7;color:#2d3748;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;}
+  .btn-create:hover{background:#e2e8f0;}
+
+  .login-error{display:none;padding:11px 13px;border-radius:10px;background:#fff0f1;color:#c43f4a;font-size:12.5px;border:1px solid #ffd7da}
+  .login-error.show{display:block}
+  .login-success{display:none;padding:11px 13px;border-radius:10px;background:#ecfdf5;color:#047857;font-size:12.5px;border:1px solid #a7f3d0}
+  .login-success.show{display:block}
+
+  .login-footer{text-align:center;color:#555b70;font-size:12px;font-weight:600;margin:22px 0 0}
+  
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);}
+  th{color:var(--text-muted);font-weight:600;}
+
+  /* dropdown styles */
+  .dropdown-wrap{position:relative;}
+  .dropdown-panel{
+    position:absolute;top:calc(100% + 10px);right:0;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    box-shadow:0 10px 30px rgba(20,20,40,0.12);
+    min-width:230px;
+    padding:8px;
+    display:none;
+    z-index:50;
+  }
+  .dropdown-panel.open{display:block;}
+.dropdown-panel.show{display:block;}
+  .dropdown-header{padding:10px 12px 8px;}
+  .dropdown-header .dname{font-weight:700;font-size:14px;}
+  .dropdown-header .drole{font-size:12.5px;color:var(--text-muted);}
+  .dropdown-divider{height:1px;background:var(--border);margin:4px 0;}
+  .dropdown-item{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 12px;border-radius:8px;
+    font-size:14px;font-weight:500;color:var(--text);
+    cursor:pointer;
+  }
+  .dropdown-item svg{width:16px;height:16px;color:var(--text-muted);}
+  .dropdown-item:hover{background:var(--track-bg);}
+
+  /* profile page */
+  .profile-card{
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--radius-lg);padding:30px;margin-bottom:24px;
+  }
+  .profile-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;}
+  .profile-head-left{display:flex;align-items:center;gap:18px;}
+  .profile-head .avatar{width:64px;height:64px;font-size:24px;border-radius:18px;}
+  .profile-head h2{font-size:20px;margin:0 0 4px;font-weight:700;}
+  .profile-head p{margin:0;color:var(--text-muted);font-size:14px;}
+  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .profile-field{background:var(--track-bg);border-radius:var(--radius-md);padding:16px 18px;}
+  .profile-field label{display:block;font-size:11.5px;font-weight:700;letter-spacing:0.04em;color:var(--text-faint);margin-bottom:6px;text-transform:uppercase;}
+  .profile-field .val{font-size:15px;font-weight:600;color:var(--text);}
+  
+  .profile-edit-box{
+    display:none;background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--radius-lg);padding:30px;margin-bottom:24px;
+  }
+  .profile-edit-box.active{display:block;}
+  .profile-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
+  .profile-edit-field{display:flex;flex-direction:column;gap:6px;}
+  .profile-edit-field label{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;}
+  .profile-edit-field input{
+    padding:11px 14px;border:1px solid var(--border);border-radius:10px;
+    background:var(--track-bg);color:var(--text);font:inherit;font-size:14px;outline:none;
+  }
+  .profile-edit-field input:focus{border-color:var(--primary);background:var(--card-bg);}
+  .profile-actions{display:flex;gap:12px;justify-content:flex-end;}
+  .btn-secondary{
+    background:var(--track-bg);color:var(--text);border:1px solid var(--border);
+    padding:10px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  .btn-secondary:hover{background:var(--border);}
+
+  /* settings page */
+  .settings-group{margin-bottom:30px;}
+  .settings-label{font-size:12.5px;font-weight:700;letter-spacing:0.04em;color:var(--text-faint);text-transform:uppercase;margin:0 0 12px;}
+  .theme-card-group, .settings-card-group{
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;
+  }
+  .theme-card-group h4, .settings-card-group h4{margin:0 0 4px;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .theme-card-group>p, .settings-card-group>p{margin:0 0 18px;font-size:13.5px;color:var(--text-muted);}
+  .theme-options{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .theme-opt{
+    border:1.5px solid var(--border);border-radius:var(--radius-md);
+    padding:18px;cursor:pointer;background:var(--track-bg);transition:.2s;
+  }
+  .theme-opt.selected{border-color:var(--primary);background:var(--primary-light);}
+  .theme-opt .icon-circle{width:38px;height:38px;font-size:17px;margin-bottom:14px;background:var(--card-bg);}
+  .theme-opt.selected .icon-circle{background:var(--primary);color:#fff;}
+  .theme-opt h5{margin:0 0 4px;font-size:14.5px;font-weight:700;}
+  .theme-opt p{margin:0;font-size:12.5px;color:var(--text-muted);}
+
+  .settings-row-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:18px;}
+  .settings-field{display:flex;flex-direction:column;gap:7px;}
+  .settings-field label{font-size:13px;font-weight:700;color:var(--text);}
+  .settings-field select, .settings-field input[type="text"], .settings-field input[type="password"]{
+    padding:11px 14px;border:1px solid var(--border);border-radius:10px;
+    background:var(--track-bg);color:var(--text);font:inherit;font-size:14px;outline:none;
+    transition:border-color .2s, background-color .2s;
+  }
+  .settings-field select:focus, .settings-field input[type="text"]:focus, .settings-field input[type="password"]:focus{
+    border-color:var(--primary);background:var(--card-bg);
+  }
+  .settings-field .password-wrapper{position:relative;display:flex;align-items:center;width:100%;}
+  .settings-field .password-wrapper input{width:100%;padding-right:45px;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--track-bg);border-radius:12px;gap:14px;}
+  .toggle-info h5{margin:0 0 3px;font-size:14px;font-weight:600;}
+  .toggle-info p{margin:0;font-size:12.5px;color:var(--text-muted);}
+  .switch{position:relative;width:46px;height:24px;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.2s;flex-shrink:0;}
+  .switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,0.25);}
+  .switch.on{background:var(--primary);}
+  .switch.on::after{transform:translateX(22px);}
+
+  /* toast */
+  .toast{
+    position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:rgba(20,22,35,0.92);color:#fff;padding:12px 22px;border-radius:12px;
+    font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9999;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+  <!-- ================= AUTHENTICATION LOGIN / REGISTER SCREEN ================= -->
+  <section class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-brand"><span class="logo-badge">🚀</span><span>CRACK<span class="accent">IT</span></span></div>
+      <h1 class="login-title">Welcome to CrackIT</h1>
+      <p class="login-subtitle">Please create an account or sign in to continue.</p>
+      
+      <div class="login-error" id="loginError" role="alert" style="margin-bottom:14px;"></div>
+      <div class="login-success" id="loginSuccess" role="alert" style="margin-bottom:14px;"></div>
+
+      <form class="login-form" id="authForm">
+        <div class="login-field" id="nameFieldGroup" style="display:none;">
+          <label for="inputName">Full Name</label>
+          <input id="inputName" type="text" placeholder="Enter your full name">
+        </div>
+
+        <div class="login-field">
+          <label for="loginEmail">Email address</label>
+          <input id="loginEmail" type="email" placeholder="Enter your email address" required>
+        </div>
+
+        <div class="login-field">
+          <label for="loginPassword">Password</label>
+          <div class="password-wrapper">
+            <input id="loginPassword" type="password" placeholder="Enter your password (min 6 chars)" minlength="6" required>
+            <button type="button" class="toggle-password" id="togglePasswordBtn" title="Show/Hide Password">👁️</button>
+          </div>
+        </div>
+
+        <div class="auth-btn-container">
+          <button type="button" class="btn-create" id="btnCreateAccount">Create Account</button>
+          <button type="submit" class="btn-signin" id="btnSignIn">Sign In</button>
+        </div>
+      </form>
+
+      <p class="login-footer">CrackIT • Placement Preparation Platform</p>
+    </div>
+  </section>
+
+<!-- ================= FULL APP UI SHELL ================= -->
+<div class="app-shell" id="appShell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">
+      <span class="logo-badge">🚀</span>
+      <span>CRACK<span class="accent">IT</span></span>
+    </div>
+
+    <nav class="nav-list">
+      <button class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-page="coding">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Coding
+      </button>
+      <button class="nav-item" data-page="aptitude">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="13" x2="10" y2="13"/><line x1="14" y1="13" x2="16" y2="13"/></svg>
+        Aptitude
+      </button>
+      <button class="nav-item" data-page="interview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        AI Mock Interview
+      </button>
+      <button class="nav-item" data-page="resume">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Resume Builder
+      </button>
+      <button class="nav-item" data-page="analysis">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analysis
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="nav-item logout-btn" id="logoutBtn" type="button" onclick="performLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main">
+    <header class="topbar">
+      <div class="dropdown-wrap" id="profileWrap">
+        <button class="profile-chip" id="profileBtn" type="button">
+          <span class="avatar" id="topAvatar">U</span>
+          <span class="name" id="topName">User</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--text-muted);"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dropdown-panel" id="profilePanel">
+          <div class="dropdown-header">
+            <div class="dname" id="ddName">User</div>
+            <div class="drole" id="ddRole">Placement Aspirant</div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" data-page="profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </div>
+          <div class="dropdown-item" data-page="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" id="ddLogoutBtn" style="color:var(--danger, #ef4444); cursor:pointer;" onclick="performLogout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="page active" id="page-dashboard">
+        <div class="welcome-banner">
+          <h1 id="bannerHeading">Welcome to CrackIT! 🚀</h1>
+          <p>Your placement preparation journey starts here. Practice coding, improve aptitude, build your resume and prepare for interviews.</p>
+          <button class="btn-white" data-page="coding">Start Practice
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <p class="banner-caption">Track your progress and improve your skills.</p>
+        </div>
+
+        <!-- ADMIN ONLY SESSION HISTORY PANEL -->
+        <div id="adminSessionCard" style="display:none; background:var(--card-bg); border:1.5px solid var(--primary); border-radius:var(--radius-lg); padding:24px; margin-bottom:34px;">
+          <h3 style="margin-top:0; font-size:18px; font-weight:700; color:var(--primary);">🔒 Admin Panel: Audit & Session Logs</h3>
+          <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:14px;">Tracks every user registration, login, and logout activity:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Action Type</th>
+                <th>User Email</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="sessionLogsBody">
+              <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No sessions recorded yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 class="section-title">Your Preparation</h2>
+        <div class="grid-3">
+          <div class="prep-card">
+            <div class="prep-card-top"><span class="icon-circle">💻</span></div>
+            <h3>Coding</h3>
+            <p>Practice programming problems and improve your problem-solving skills.</p>
+            <button class="btn-primary" data-page="coding">Start Coding</button>
+          </div>
+          <div class="prep-card">
+            <div class="prep-card-top"><span class="icon-circle">🧮</span></div>
+            <h3>Aptitude</h3>
+            <p>Improve quantitative, logical reasoning and verbal ability.</p>
+            <button class="btn-primary" data-page="aptitude">Start Aptitude</button>
+          </div>
+          <div class="prep-card">
+            <div class="prep-card-top"><span class="icon-circle">🎤</span></div>
+            <h3>AI Mock Interview</h3>
+            <p>Practice interview questions with an AI interviewer.</p>
+            <button class="btn-primary" data-page="interview">Start Interview</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CODING ============ -->
+      <section class="page" id="page-coding">
+        <h1 class="page-title">Coding</h1>
+        <p class="page-subtitle">Practice programming problems and improve your problem-solving skills.</p>
+        <div class="empty-card">
+          <span class="icon-circle">💻</span>
+          <h3>No problems attempted yet</h3>
+          <p>Start with a beginner-friendly problem set covering arrays, strings and basic recursion.</p>
+        </div>
+      </section>
+
+      <!-- ============ APTITUDE ============ -->
+      <section class="page" id="page-aptitude">
+        <h1 class="page-title">Aptitude</h1>
+        <p class="page-subtitle">Improve quantitative, logical reasoning and verbal ability.</p>
+        <div class="empty-card">
+          <span class="icon-circle">🧮</span>
+          <h3>No aptitude tests taken yet</h3>
+          <p>Take your first test to find your baseline across quants, reasoning and verbal sections.</p>
+        </div>
+      </section>
+
+      <!-- ============ AI MOCK INTERVIEW ============ -->
+      <section class="page" id="page-interview">
+        <h1 class="page-title">AI Mock Interview</h1>
+        <p class="page-subtitle">Practice interview questions with an AI interviewer.</p>
+        <div class="empty-card">
+          <span class="icon-circle">🎤</span>
+          <h3>No interviews completed yet</h3>
+          <p>Run your first mock interview and get instant feedback on clarity, structure and confidence.</p>
+        </div>
+      </section>
+
+      <!-- ============ RESUME BUILDER ============ -->
+      <section class="page" id="page-resume">
+        <h1 class="page-title">Resume Builder</h1>
+        <p class="page-subtitle">Create a professional resume based on your skills, education, projects and target job role.</p>
+        <div class="empty-card">
+          <span class="icon-circle">📄</span>
+          <h3>No resume created yet</h3>
+          <p>Start a new resume and optionally choose a target company.</p>
+        </div>
+      </section>
+
+      <!-- ============ ANALYSIS ============ -->
+      <section class="page" id="page-analysis">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:14px;">
+          <div>
+            <h1 class="page-title">Performance Analysis & Insights</h1>
+            <p class="page-subtitle" style="margin-bottom:0;">Unified progress analytics across Coding, Aptitude, AI Mock Interviews and Resume readiness.</p>
+          </div>
+          <div id="trendIndicatorBadge" class="badge" style="padding:8px 16px; font-size:13px; font-weight:700;">
+            🟡 Analyzing Performance...
+          </div>
+          <button onclick="renderAnalysisDashboard(); showToast('Analysis refreshed!', true);" style="background:var(--primary);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;" title="Reload analysis data">🔄 Refresh</button>
+        </div>
+
+        <!-- SUMMARY KPI METRICS -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px; margin-bottom:28px;">
+          <div class="prep-card" style="padding:20px;">
+            <div style="font-size:12px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em;">Overall Readiness</div>
+            <div style="font-size:34px; font-weight:800; color:var(--primary); margin:8px 0;" id="kpiReadiness">--%</div>
+            <div style="font-size:12.5px; color:var(--text-muted);" id="kpiReadinessSub">Weighted platform readiness</div>
+          </div>
+          <div class="prep-card" style="padding:20px;">
+            <div style="font-size:12px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em;">Total Assessments</div>
+            <div style="font-size:34px; font-weight:800; color:var(--text); margin:8px 0;" id="kpiTotalTests">0</div>
+            <div style="font-size:12.5px; color:var(--text-muted);" id="kpiTotalTestsSub">Attempts recorded</div>
+          </div>
+          <div class="prep-card" style="padding:20px;">
+            <div style="font-size:12px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em;">Average Score</div>
+            <div style="font-size:34px; font-weight:800; color:#10b981; margin:8px 0;" id="kpiAvgScore">--%</div>
+            <div style="font-size:12.5px; color:var(--text-muted);" id="kpiAvgScoreSub">Historical performance</div>
+          </div>
+          <div class="prep-card" style="padding:20px;">
+            <div style="font-size:12px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.04em;">Overall Accuracy</div>
+            <div style="font-size:34px; font-weight:800; color:#b9720f; margin:8px 0;" id="kpiAccuracy">--%</div>
+            <div style="font-size:12.5px; color:var(--text-muted);" id="kpiAccuracySub">Test solution accuracy</div>
+          </div>
+        </div>
+
+        <!-- TREND COMPARISON BANNER -->
+        <div id="trendComparisonCard" style="background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; margin-bottom:28px;">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- SCORE PROGRESS OVER ATTEMPTS (SVG CHART) -->
+        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; margin-bottom:28px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="margin:0 0 4px; font-size:17px; font-weight:700;">Score Progress Over Attempts</h3>
+              <p style="margin:0; font-size:13px; color:var(--text-muted);">Visual trajectory of your performance across test attempts</p>
+            </div>
+            <div style="display:flex; gap:16px; font-size:12.5px; font-weight:600;">
+              <span style="display:flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:50%; background:#5457D9;"></span>Coding</span>
+              <span style="display:flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:50%; background:#10b981;"></span>Aptitude</span>
+              <span style="display:flex; align-items:center; gap:6px;"><span style="width:10px; height:10px; border-radius:50%; background:#3b82f6;"></span>Interview</span>
+            </div>
+          </div>
+          <div id="analysisChartContainer" style="width:100%; min-height:220px; overflow-x:auto;">
+            <!-- Rendered SVG chart -->
+          </div>
+        </div>
+
+        <!-- MODULE-WISE ANALYSIS -->
+        <h2 class="section-title">Module Performance Breakdown</h2>
+        <div class="grid-3" style="margin-bottom:28px;">
+          <!-- Coding -->
+          <div class="prep-card" id="analysisCodingCard">
+            <div class="prep-card-top">
+              <span class="icon-circle">💻</span>
+              <span class="badge" id="badgeCodingStatus">Not Started</span>
+            </div>
+            <h3>Coding Practice</h3>
+            <p id="codingStatSummary">Practice programming problems and track solved challenges.</p>
+            <div style="margin:16px 0; background:var(--track-bg); border-radius:var(--radius-md); padding:14px;" id="codingMetricsBox">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;"><span>Solved / Total:</span><strong id="codingSolvedVal">0 / 0</strong></div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;"><span>Test Cases Passed:</span><strong id="codingCasesVal">0 / 0</strong></div>
+              <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Avg Score:</span><strong id="codingAvgVal">--%</strong></div>
+            </div>
+            <button class="btn-primary" data-page="coding">Go to Coding</button>
+          </div>
+
+          <!-- Aptitude -->
+          <div class="prep-card" id="analysisAptitudeCard">
+            <div class="prep-card-top">
+              <span class="icon-circle">🧮</span>
+              <span class="badge" id="badgeAptitudeStatus">Not Started</span>
+            </div>
+            <h3>Aptitude Assessment</h3>
+            <p id="aptitudeStatSummary">Quantitative, logical reasoning and verbal ability tests.</p>
+            <div style="margin:16px 0; background:var(--track-bg); border-radius:var(--radius-md); padding:14px;" id="aptitudeMetricsBox">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;"><span>Tests Taken:</span><strong id="aptitudeTestsVal">0</strong></div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;"><span>Avg Score:</span><strong id="aptitudeAvgVal">--%</strong></div>
+              <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Accuracy:</span><strong id="aptitudeAccuracyVal">--%</strong></div>
+            </div>
+            <button class="btn-primary" data-page="aptitude">Go to Aptitude</button>
+          </div>
+
+          <!-- Interview -->
+          <div class="prep-card" id="analysisInterviewCard">
+            <div class="prep-card-top">
+              <span class="icon-circle">🎤</span>
+              <span class="badge" id="badgeInterviewStatus">Not Started</span>
+            </div>
+            <h3>AI Mock Interview</h3>
+            <p id="interviewStatSummary">AI-evaluated interviews for clarity, technical depth and communication.</p>
+            <div style="margin:16px 0; background:var(--track-bg); border-radius:var(--radius-md); padding:14px;" id="interviewMetricsBox">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;"><span>Interviews Completed:</span><strong id="interviewCountVal">0</strong></div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;"><span>Avg Score:</span><strong id="interviewAvgVal">--%</strong></div>
+              <div style="display:flex; justify-content:space-between; font-size:13px;"><span>Latest Target Role:</span><strong id="interviewRoleVal">General</strong></div>
+            </div>
+            <button class="btn-primary" data-page="interview">Go to Interview</button>
+          </div>
+        </div>
+
+        <!-- AREAS FOR IMPROVEMENT -->
+        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; margin-bottom:28px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+            <h3 style="margin:0; font-size:17px; font-weight:700; color:#e0555f; display:flex; align-items:center; gap:8px;">
+              <span>⚡</span> Areas for Improvement
+            </h3>
+            <span style="font-size:12.5px; color:var(--text-muted); background:var(--track-bg); padding:5px 12px; border-radius:20px; border:1px solid var(--border);" id="improvementContextBadge">Based on your submitted assessments</span>
+          </div>
+          <div id="analysisWeaknessesList">
+            <!-- Dynamically populated based on submitted assessments -->
+          </div>
+        </div>
+
+        <!-- ATTEMPT HISTORY TABLE -->
+        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; margin-bottom:34px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <h3 style="margin:0; font-size:17px; font-weight:700;">Complete Attempt History</h3>
+            <span style="font-size:12.5px; color:var(--text-muted);" id="attemptHistoryCount">0 records found</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Module</th>
+                  <th>Date & Time</th>
+                  <th>Score</th>
+                  <th>Performance Details</th>
+                  <th>Trend vs Previous</th>
+                </tr>
+              </thead>
+              <tbody id="analysisHistoryBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROFILE ============ -->
+      <section class="page" id="page-profile">
+        <h1 class="page-title">Profile</h1>
+        <p class="page-subtitle">Your profile information is shared across all CrackIT modules.</p>
+
+        <!-- VIEW PROFILE CARD -->
+        <div class="profile-card" id="profileViewCard">
+          <div class="profile-head">
+            <div class="profile-head-left">
+              <span class="avatar" id="profileCardAvatar" style="width:60px; height:60px; font-size:22px;">U</span>
+              <div>
+                <h2 id="profileCardName" style="margin:0 0 4px; font-size:20px; font-weight:700;">User</h2>
+                <p id="profileCardEmail" style="margin:0; color:var(--text-muted); font-size:13.5px;">user@crackit.com</p>
+              </div>
+            </div>
+            <button class="btn-primary" id="btnEditProfile" style="width:auto; padding:10px 20px;">Edit Profile ✏️</button>
+          </div>
+          <div class="profile-grid">
+            <div class="profile-field"><label>Target Job Role</label><div class="val" id="profileValRole">Software Engineer</div></div>
+            <div class="profile-field"><label>College / University</label><div class="val" id="profileValCollege">Not set</div></div>
+            <div class="profile-field"><label>Graduation Year</label><div class="val" id="profileValGradYear">2025</div></div>
+            <div class="profile-field"><label>Primary Skills</label><div class="val" id="profileValSkills">Java, Python, DSA, SQL</div></div>
+            <div class="profile-field"><label>Phone Number</label><div class="val" id="profileValPhone">Not set</div></div>
+            <div class="profile-field"><label>Career Objective / Bio</label><div class="val" id="profileValBio">Placement aspirant preparing for software roles.</div></div>
+          </div>
+        </div>
+
+        <!-- EDIT PROFILE BOX -->
+        <div class="profile-edit-box" id="profileEditBox">
+          <h3 style="margin-top:0; margin-bottom:18px; font-size:18px; font-weight:700;">Edit Profile Details</h3>
+          <form id="profileEditForm">
+            <div class="profile-edit-grid">
+              <div class="profile-edit-field">
+                <label for="editProfileName">Full Name</label>
+                <input id="editProfileName" type="text" required placeholder="Enter full name">
+              </div>
+              <div class="profile-edit-field">
+                <label for="editProfileRole">Target Job Role</label>
+                <input id="editProfileRole" type="text" placeholder="e.g. Full Stack Developer, Data Analyst">
+              </div>
+              <div class="profile-edit-field">
+                <label for="editProfileCollege">College / University</label>
+                <input id="editProfileCollege" type="text" placeholder="e.g. ABC Institute of Technology">
+              </div>
+              <div class="profile-edit-field">
+                <label for="editProfileGradYear">Graduation Year</label>
+                <input id="editProfileGradYear" type="text" placeholder="e.g. 2025">
+              </div>
+              <div class="profile-edit-field" style="grid-column:1 / -1;">
+                <label for="editProfileSkills">Skills (comma-separated)</label>
+                <input id="editProfileSkills" type="text" placeholder="e.g. Java, Python, C++, React, SQL, DSA">
+              </div>
+              <div class="profile-edit-field">
+                <label for="editProfilePhone">Phone Number</label>
+                <input id="editProfilePhone" type="text" placeholder="e.g. +91 9876543210">
+              </div>
+              <div class="profile-edit-field">
+                <label for="editProfileBio">Career Bio / Goal</label>
+                <input id="editProfileBio" type="text" placeholder="Brief career objective">
+              </div>
+            </div>
+            <div class="profile-actions">
+              <button type="button" class="btn-secondary" id="btnCancelEditProfile">Cancel</button>
+              <button type="submit" class="btn-primary" style="width:auto; padding:10px 22px;">Save Profile ✓</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ SETTINGS ============ -->
+      <section class="page" id="page-settings">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:14px;">
+          <div>
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle" style="margin-bottom:0;">Manage interface theme, assessment notifications, and account privacy & security.</p>
+          </div>
+          <button id="btnSaveAllSettings" class="btn-primary" style="width:auto; padding:10px 22px;">Save Settings ✓</button>
+        </div>
+
+        <!-- 1. THEME & APPEARANCE -->
+        <div class="settings-group">
+          <p class="settings-label">1. Theme & Appearance</p>
+          <div class="settings-card-group">
+            <h4>🎨 Application Theme</h4>
+            <p>Select your preferred color theme across the entire CrackIT platform.</p>
+            <div class="theme-options">
+              <div class="theme-opt" data-theme-choice="light">
+                <span class="icon-circle">☀️</span>
+                <h5>Light</h5>
+                <p>Clean, bright interface</p>
+              </div>
+              <div class="theme-opt" data-theme-choice="dark">
+                <span class="icon-circle">🌙</span>
+                <h5>Dark</h5>
+                <p>Easy on the eyes at night</p>
+              </div>
+              <div class="theme-opt selected" data-theme-choice="system">
+                <span class="icon-circle">🖥️</span>
+                <h5>System Default</h5>
+                <p>Matches operating system</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. NOTIFICATIONS & ASSESSMENT ALERTS -->
+        <div class="settings-group">
+          <p class="settings-label">2. Notifications & Assessment Alerts</p>
+          <div class="settings-card-group">
+            <h4>🔔 Notification Preferences</h4>
+            <p>Control alerts, feedback sounds, and reminders when preparing and submitting assessments.</p>
+
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <h5>📋 Assessment Submission Notifications</h5>
+                  <p>Enable or disable notification alerts and confirmation banners upon submitting assessments (Coding, Aptitude, Mock Interview)</p>
+                </div>
+                <div class="switch on" id="switchAssessmentNotif" data-setting="notifyOnAssessmentSubmit"></div>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <h5>🔊 Audio Cues & Sound Effects</h5>
+                  <p>Play audio confirmation chime upon assessment submission and timer countdowns</p>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <button type="button" class="btn-secondary" id="btnTestSound" style="padding:6px 14px; font-size:12.5px; border-radius:8px; cursor:pointer;">Test Sound 🔊</button>
+                  <div class="switch on" id="switchSoundEffects" data-setting="soundEffects"></div>
+                </div>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <h5>⏰ Practice & Milestone Reminders</h5>
+                  <p>Show desktop notifications for scheduled practice sessions and target placement milestones</p>
+                </div>
+                <div class="switch on" id="switchNotifications" data-setting="notifications"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. PRIVACY & SECURITY -->
+        <div class="settings-group">
+          <p class="settings-label">3. Privacy & Security</p>
+          <div class="settings-card-group">
+            <h4>🔒 Change Password</h4>
+            <p>Update your account password to protect your placement preparation records.</p>
+
+            <div id="changePasswordAlert" style="display:none; padding:12px 16px; border-radius:10px; font-size:13.5px; font-weight:600; margin-bottom:16px;"></div>
+
+            <form id="changePasswordForm" style="display:flex; flex-direction:column; gap:16px; max-width:580px;">
+              <div class="settings-field">
+                <label for="currentPassword">Current Password</label>
+                <div class="password-wrapper">
+                  <input id="currentPassword" type="password" placeholder="Enter current password" required autocomplete="current-password">
+                  <button type="button" class="toggle-password" id="toggleCurrentPwd" title="Show/Hide Password">👁️</button>
+                </div>
+              </div>
+
+              <div class="settings-row-grid" style="grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));">
+                <div class="settings-field">
+                  <label for="newPassword">New Password</label>
+                  <div class="password-wrapper">
+                    <input id="newPassword" type="password" placeholder="At least 6 characters" minlength="6" required autocomplete="new-password">
+                    <button type="button" class="toggle-password" id="toggleNewPwd" title="Show/Hide Password">👁️</button>
+                  </div>
+                </div>
+
+                <div class="settings-field">
+                  <label for="confirmNewPassword">Confirm New Password</label>
+                  <div class="password-wrapper">
+                    <input id="confirmNewPassword" type="password" placeholder="Re-enter new password" minlength="6" required autocomplete="new-password">
+                    <button type="button" class="toggle-password" id="toggleConfirmPwd" title="Show/Hide Password">👁️</button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:12px; align-items:center; margin-top:6px;">
+                <button type="submit" class="btn-primary" id="btnUpdatePassword" style="width:auto; padding:11px 24px;">Update Password 🔒</button>
+                <button type="reset" class="btn-secondary" id="btnResetPasswordForm" style="width:auto;">Clear</button>
+              </div>
+            </form>
+
+            <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border);">
+              <h5 style="margin:0 0 6px; font-size:14.5px; font-weight:700;">🛡️ Account Session & Privacy Controls</h5>
+              <p style="margin:0 0 16px; font-size:13px; color:var(--text-muted);">Manage your active login session and assessment data.</p>
+
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div style="font-size:13px; color:var(--text-muted); background:var(--track-bg); padding:9px 15px; border-radius:10px; border:1px solid var(--border);">
+                  Active Account: <strong id="settingsUserEmail" style="color:var(--text);">-</strong>
+                </div>
+                <button type="button" class="btn-secondary" id="btnClearHistoryBtn" style="color:#ef4444; border-color:rgba(239, 68, 68, 0.4); font-size:13px;">
+                  🗑️ Clear Assessment History
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <div class="toast" id="toastMessage"></div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var loginScreen = document.getElementById('loginScreen');
+  var appShell = document.getElementById('appShell');
+  var authForm = document.getElementById('authForm');
+  var nameFieldGroup = document.getElementById('nameFieldGroup');
+  var inputName = document.getElementById('inputName');
+  var loginEmail = document.getElementById('loginEmail');
+  var loginPassword = document.getElementById('loginPassword');
+  var togglePasswordBtn = document.getElementById('togglePasswordBtn');
+  var loginError = document.getElementById('loginError');
+  var loginSuccess = document.getElementById('loginSuccess');
+  var btnCreateAccount = document.getElementById('btnCreateAccount');
+  var adminSessionCard = document.getElementById('adminSessionCard');
+  var sessionLogsBody = document.getElementById('sessionLogsBody');
+
+  var ADMIN_EMAIL = "admin@crackit.com";
+
+  // Toggle Password Visibility
+  togglePasswordBtn.addEventListener('click', function(){
+    if(loginPassword.type === 'password'){
+      loginPassword.type = 'text';
+      togglePasswordBtn.textContent = '🙈';
+    } else {
+      loginPassword.type = 'password';
+      togglePasswordBtn.textContent = '👁️';
+    }
+  });
+
+  function showError(msg){
+    loginError.textContent = msg;
+    loginError.classList.add('show');
+    loginSuccess.classList.remove('show');
+  }
+
+  function showSuccess(msg){
+    loginSuccess.textContent = msg;
+    loginSuccess.classList.add('show');
+    loginError.classList.remove('show');
+  }
+
+  function clearAlerts(){
+    loginError.classList.remove('show');
+    loginSuccess.classList.remove('show');
+  }
+
+  function getUsers(){
+    try { return JSON.parse(localStorage.getItem('crackit_db_users')) || []; } catch(e){ return []; }
+  }
+
+  function recordSession(email, action){
+    try {
+      var logs = JSON.parse(localStorage.getItem('crackit_session_history')) || [];
+      logs.push({ email: email, action: action, time: new Date().toLocaleString() });
+      localStorage.setItem('crackit_session_history', JSON.stringify(logs));
+    } catch(e){}
+  }
+
+  function renderLogs(){
+    try {
+      var logs = JSON.parse(localStorage.getItem('crackit_session_history')) || [];
+      if(logs.length === 0){
+        sessionLogsBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No sessions recorded yet.</td></tr>';
+        return;
+      }
+      var html = "";
+      for(var i = logs.length - 1; i >= 0; i--){
+        var log = logs[i];
+        var badgeColor = log.action === 'REGISTER' ? '#047857' : (log.action === 'LOGIN' ? '#5457D9' : '#e0555f');
+        html += '<tr>' +
+                  '<td><span style="color:' + badgeColor + '; font-weight:700;">[' + log.action + ']</span></td>' +
+                  '<td>' + log.email + '</td>' +
+                  '<td>' + log.time + '</td>' +
+                '</tr>';
+      }
+      sessionLogsBody.innerHTML = html;
+    } catch(e){
+      sessionLogsBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">Error loading logs.</td></tr>';
+    }
+  }
+
+  // 1. CREATE ACCOUNT BUTTON
+  btnCreateAccount.addEventListener('click', function(){
+    clearAlerts();
+    if(nameFieldGroup.style.display === "none"){
+      nameFieldGroup.style.display = "flex";
+      inputName.setAttribute("required", "true");
+      showSuccess("Please enter your name, email, and password, then click 'Create Account'.");
+      return;
+    }
+
+    var name = inputName.value.trim();
+    var email = loginEmail.value.trim().toLowerCase();
+    var password = loginPassword.value;
+
+    if(!name || !email || !password){
+      showError("All fields are required to create an account.");
+      return;
+    }
+    if(password.length < 6){
+      showError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    var users = getUsers();
+    var existing = users.find(function(u){ return u.email === email; });
+    if(existing){
+      showError("An account with this email already exists. Please Sign In.");
+      return;
+    }
+
+    users.push({ name: name, email: email, password: password });
+    localStorage.setItem('crackit_db_users', JSON.stringify(users));
+    recordSession(email, "REGISTER");
+
+    showSuccess("Account created successfully! You can now sign in.");
+    nameFieldGroup.style.display = "none";
+    inputName.removeAttribute("required");
+    inputName.value = "";
+    loginPassword.value = "";
+  });
+
+  // 2. SIGN IN BUTTON (Form Submit)
+  authForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearAlerts();
+
+    var email = loginEmail.value.trim().toLowerCase();
+    var password = loginPassword.value;
+
+    if(!email || !password){
+      showError("Please enter your email and password.");
+      return;
+    }
+
+    var users = getUsers();
+    var validUser = users.find(function(u){ return u.email === email && u.password === password; });
+
+    if(!validUser){
+      showError("Access Denied: Account not found or incorrect password. Please create an account first.");
+      loginPassword.value = "";
+      return;
+    }
+
+    recordSession(email, "LOGIN");
+    localStorage.setItem('crackit_active_user', JSON.stringify(validUser));
+    localStorage.setItem('crackit-user', JSON.stringify(validUser));
+    launchApp(validUser);
+  });
+
+  var toastTimeout = null;
+  function showToast(msg, isSuccess){
+    var t = document.getElementById('toastMessage');
+    if(!t) return;
+    t.textContent = msg;
+    t.className = 'toast show' + (isSuccess ? ' toast-success' : '');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function(){
+      t.className = 'toast';
+    }, 3200);
+  }
+
+  /* ---------------- Global Theme & Unified Settings Management ---------------- */
+  var root = document.documentElement;
+  var themeOpts = document.querySelectorAll('.theme-opt');
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+  var DEFAULT_SETTINGS = {
+    theme: 'system',
+    notifyOnAssessmentSubmit: true,
+    soundEffects: true,
+    notifications: true
+  };
+
+  function getUserSettings(){
+    try {
+      var saved = localStorage.getItem('crackit_user_settings');
+      if(saved) return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(saved));
+    } catch(e){}
+    return Object.assign({}, DEFAULT_SETTINGS);
+  }
+
+  function applyGlobalTheme(choice){
+    var resolved = choice === 'system' ? (mq.matches ? 'dark' : 'light') : choice;
+    root.setAttribute('data-theme', resolved);
+    themeOpts.forEach(function(o){
+      o.classList.toggle('selected', o.dataset.themeChoice === choice);
+    });
+    try {
+      localStorage.setItem('crackit-theme', choice);
+      var uSet = localStorage.getItem('crackit_user_settings');
+      var settings = uSet ? JSON.parse(uSet) : {};
+      settings.theme = choice;
+      localStorage.setItem('crackit_user_settings', JSON.stringify(settings));
+    } catch(e){}
+  }
+
+  function saveUserSettings(newSettings, showToastMsg){
+    try {
+      localStorage.setItem('crackit_user_settings', JSON.stringify(newSettings));
+      if(newSettings.theme){
+        applyGlobalTheme(newSettings.theme);
+      }
+      window.dispatchEvent(new Event('storage'));
+      if(showToastMsg !== false){
+        showToast('Settings saved successfully! ✓', true);
+      }
+    } catch(e){}
+  }
+
+  function renderSettingsPage(){
+    var settings = getUserSettings();
+    applyGlobalTheme(settings.theme || 'system');
+
+    document.querySelectorAll('#page-settings [data-setting]').forEach(function(el){
+      var key = el.dataset.setting;
+      if(el.tagName === 'SELECT'){
+        if(settings[key] !== undefined) el.value = settings[key];
+      } else if(el.classList.contains('switch')){
+        var val = settings[key];
+        el.classList.toggle('on', val === true || val === 'true');
+      }
+    });
+
+    try {
+      var rawActive = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+      var user = rawActive ? JSON.parse(rawActive) : null;
+      var emailEl = document.getElementById('settingsUserEmail');
+      if(emailEl && user){
+        emailEl.textContent = user.email || user.name || 'Active User';
+      }
+    } catch(e){}
+  }
+
+  themeOpts.forEach(function(opt){
+    opt.addEventListener('click', function(){
+      var choice = opt.dataset.themeChoice;
+      var settings = getUserSettings();
+      settings.theme = choice;
+      saveUserSettings(settings, false);
+      showToast('Theme updated to ' + choice.toUpperCase() + '.', true);
+    });
+  });
+
+  document.querySelectorAll('#page-settings select[data-setting]').forEach(function(sel){
+    sel.addEventListener('change', function(){
+      var settings = getUserSettings();
+      settings[sel.dataset.setting] = sel.value;
+      saveUserSettings(settings);
+    });
+  });
+
+  // --- Web Audio Assessment Sound Effects ---
+  function playAssessmentSubmitSound(force){
+    try {
+      if(!force){
+        var rawSettings = localStorage.getItem('crackit_user_settings');
+        var userSettings = rawSettings ? JSON.parse(rawSettings) : {};
+        if(userSettings.soundEffects === false) return;
+      }
+
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if(!AudioCtx) return;
+      var ctx = new AudioCtx();
+      if(ctx.state === 'suspended'){
+        ctx.resume();
+      }
+
+      var now = ctx.currentTime;
+      // 3-note ascending cheerful chime: F5 (698.46 Hz), A5 (880.00 Hz), C6 (1046.50 Hz)
+      var notes = [
+        { freq: 698.46, time: 0.00, dur: 0.28 },
+        { freq: 880.00, time: 0.10, dur: 0.32 },
+        { freq: 1046.50, time: 0.22, dur: 0.55 }
+      ];
+
+      notes.forEach(function(note){
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(note.freq, now + note.time);
+
+        gain.gain.setValueAtTime(0.0001, now + note.time);
+        gain.gain.exponentialRampToValueAtTime(0.24, now + note.time + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + note.time + note.dur);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + note.time);
+        osc.stop(now + note.time + note.dur + 0.05);
+      });
+    } catch(e){
+      console.warn('Audio playback error:', e);
+    }
+  }
+
+  document.querySelectorAll('#page-settings .switch[data-setting]').forEach(function(sw){
+    sw.addEventListener('click', function(){
+      sw.classList.toggle('on');
+      var settings = getUserSettings();
+      var isOn = sw.classList.contains('on');
+      settings[sw.dataset.setting] = isOn;
+      saveUserSettings(settings);
+      if(sw.dataset.setting === 'soundEffects' && isOn){
+        playAssessmentSubmitSound(true);
+      }
+    });
+  });
+
+  var btnTestSound = document.getElementById('btnTestSound');
+  if(btnTestSound){
+    btnTestSound.addEventListener('click', function(){
+      playAssessmentSubmitSound(true);
+      showToast('Playing assessment submission chime! 🔊', true);
+    });
+  }
+
+  var btnSaveAllSettings = document.getElementById('btnSaveAllSettings');
+  if(btnSaveAllSettings){
+    btnSaveAllSettings.addEventListener('click', function(){
+      var settings = getUserSettings();
+      document.querySelectorAll('#page-settings [data-setting]').forEach(function(el){
+        var key = el.dataset.setting;
+        if(el.tagName === 'SELECT'){
+          settings[key] = el.value;
+        } else if(el.classList.contains('switch')){
+          settings[key] = el.classList.contains('on');
+        }
+      });
+      saveUserSettings(settings, true);
+      if(settings.soundEffects !== false){
+        playAssessmentSubmitSound(true);
+      }
+    });
+  }
+
+  // --- Password Visibility Toggles ---
+  function setupPasswordToggle(btnId, inputId){
+    var btn = document.getElementById(btnId);
+    var input = document.getElementById(inputId);
+    if(btn && input){
+      btn.addEventListener('click', function(){
+        if(input.type === 'password'){
+          input.type = 'text';
+          btn.textContent = '🙈';
+        } else {
+          input.type = 'password';
+          btn.textContent = '👁️';
+        }
+      });
+    }
+  }
+  setupPasswordToggle('toggleCurrentPwd', 'currentPassword');
+  setupPasswordToggle('toggleNewPwd', 'newPassword');
+  setupPasswordToggle('toggleConfirmPwd', 'confirmNewPassword');
+
+  // --- Change Password Form Handling ---
+  var changePasswordForm = document.getElementById('changePasswordForm');
+  var changePasswordAlert = document.getElementById('changePasswordAlert');
+
+  function showPasswordAlert(msg, isSuccess){
+    if(!changePasswordAlert) return;
+    changePasswordAlert.textContent = msg;
+    changePasswordAlert.style.display = 'block';
+    if(isSuccess){
+      changePasswordAlert.style.background = 'rgba(16, 185, 129, 0.12)';
+      changePasswordAlert.style.color = '#059669';
+      changePasswordAlert.style.border = '1px solid #10b981';
+    } else {
+      changePasswordAlert.style.background = 'rgba(239, 68, 68, 0.12)';
+      changePasswordAlert.style.color = '#dc2626';
+      changePasswordAlert.style.border = '1px solid #ef4444';
+    }
+  }
+
+  if(changePasswordForm){
+    changePasswordForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      if(changePasswordAlert) changePasswordAlert.style.display = 'none';
+
+      var currPwd = document.getElementById('currentPassword').value;
+      var newPwd = document.getElementById('newPassword').value;
+      var confPwd = document.getElementById('confirmNewPassword').value;
+
+      var rawActive = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+      var activeUser = rawActive ? JSON.parse(rawActive) : null;
+
+      if(!activeUser || !activeUser.email){
+        showPasswordAlert('Please sign in to change your password.', false);
+        return;
+      }
+
+      var users = getUsers();
+      var userIdx = users.findIndex(function(u){ return u.email.toLowerCase() === activeUser.email.toLowerCase(); });
+      var userRecord = userIdx !== -1 ? users[userIdx] : activeUser;
+
+      if(userRecord.password && userRecord.password !== currPwd){
+        showPasswordAlert('Current password does not match our records.', false);
+        return;
+      }
+
+      if(newPwd.length < 6){
+        showPasswordAlert('New password must be at least 6 characters long.', false);
+        return;
+      }
+
+      if(newPwd !== confPwd){
+        showPasswordAlert('New password and confirmation password do not match.', false);
+        return;
+      }
+
+      if(currPwd === newPwd){
+        showPasswordAlert('New password must be different from current password.', false);
+        return;
+      }
+
+      // Update stored user
+      activeUser.password = newPwd;
+      if(userIdx !== -1){
+        users[userIdx].password = newPwd;
+      } else {
+        users.push(activeUser);
+      }
+      localStorage.setItem('crackit_db_users', JSON.stringify(users));
+      localStorage.setItem('crackit_active_user', JSON.stringify(activeUser));
+      localStorage.setItem('crackit-user', JSON.stringify(activeUser));
+
+      recordSession(activeUser.email, "PASSWORD_CHANGE");
+
+      showPasswordAlert('Password updated successfully! ✓', true);
+      showToast('Password changed successfully! 🔒', true);
+      changePasswordForm.reset();
+    });
+  }
+
+  // --- Clear History Privacy Control ---
+  var btnClearHistoryBtn = document.getElementById('btnClearHistoryBtn');
+  if(btnClearHistoryBtn){
+    btnClearHistoryBtn.addEventListener('click', function(){
+      var rawActive = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+      var activeUser = rawActive ? JSON.parse(rawActive) : null;
+      if(!activeUser || !activeUser.email){
+        showToast('No active user logged in.', false);
+        return;
+      }
+      if(confirm('Are you sure you want to clear your assessment history? This cannot be undone.')){
+        var histKey = 'crackit_history_' + activeUser.email;
+        localStorage.removeItem(histKey);
+        localStorage.removeItem('crackit-coding-last-score');
+        localStorage.removeItem('crackit-aptitude-last-score');
+        window.dispatchEvent(new Event('storage'));
+        showToast('Assessment history successfully cleared! 🗑️', true);
+      }
+    });
+  }
+
+  mq.addEventListener('change', function(){
+    var settings = getUserSettings();
+    if(settings.theme === 'system') applyGlobalTheme('system');
+  });
+
+  window.addEventListener('storage', function(e){
+    if(e.key === 'crackit-theme' || e.key === 'crackit_user_settings'){
+      renderSettingsPage();
+    }
+    if(e.key === 'crackit_active_user' || e.key === 'crackit-user' || (e.key && e.key.indexOf('crackit_profile_') === 0)){
+      renderProfilePage();
+    }
+    if(e.key && e.key.indexOf('crackit_history_') === 0){
+      var currentPage = document.querySelector('.page.active');
+      if(currentPage && currentPage.id === 'page-analysis'){
+        renderAnalysisDashboard();
+      }
+    }
+  });
+
+  function mergeHistoryArrays(arr1, arr2) {
+    var list1 = Array.isArray(arr1) ? arr1 : [];
+    var list2 = Array.isArray(arr2) ? arr2 : [];
+    var seenKeys = {};
+    var result = [];
+
+    function getItemKey(item) {
+      if (!item) return '';
+      if (item.id) return String(item.id);
+      if (item.timestamp) return item.timestamp + '_' + (item.score || '') + '_' + (item.module || '');
+      return JSON.stringify(item);
+    }
+
+    list1.concat(list2).forEach(function(item) {
+      if (!item) return;
+      var k = getItemKey(item);
+      if (k && !seenKeys[k]) {
+        seenKeys[k] = true;
+        result.push(item);
+      }
+    });
+    return result;
+  }
+
+  function syncFromUrlParams(){
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var themeParam = params.get('theme');
+      var emailParam = params.get('email');
+      var nameParam = params.get('name');
+      var settingsParam = params.get('settings');
+      var historyParam = params.get('history');
+
+      if (themeParam) {
+        try { localStorage.setItem('crackit-theme', themeParam); } catch(e){}
+      }
+
+      if (settingsParam) {
+        try {
+          var decodedSettings = JSON.parse(decodeURIComponent(settingsParam));
+          localStorage.setItem('crackit_user_settings', JSON.stringify(decodedSettings));
+        } catch(e){}
+      } else if (themeParam) {
+        try {
+          var uSet = localStorage.getItem('crackit_user_settings');
+          var sObj = uSet ? JSON.parse(uSet) : {};
+          sObj.theme = themeParam;
+          localStorage.setItem('crackit_user_settings', JSON.stringify(sObj));
+        } catch(e){}
+      }
+
+      if (emailParam) {
+        var activeUser = {
+          email: emailParam,
+          name: nameParam || emailParam.split('@')[0]
+        };
+        try {
+          localStorage.setItem('crackit_active_user', JSON.stringify(activeUser));
+          localStorage.setItem('crackit-user', JSON.stringify(activeUser));
+        } catch(e){}
+
+        var profObj = {
+          email: emailParam,
+          name: nameParam || emailParam.split('@')[0],
+          targetRole: params.get('role') || '',
+          college: params.get('college') || '',
+          gradYear: params.get('gradYear') || '',
+          skills: params.get('skills') || '',
+          phone: params.get('phone') || '',
+          bio: params.get('bio') || ''
+        };
+        try {
+          var existingProf = {};
+          try { existingProf = JSON.parse(localStorage.getItem('crackit_profile_' + emailParam) || '{}'); } catch(ex){}
+          var mergedProf = Object.assign({}, profObj, existingProf);
+          if (nameParam) mergedProf.name = nameParam;
+          localStorage.setItem('crackit_profile_' + emailParam, JSON.stringify(mergedProf));
+        } catch(e){}
+      }
+
+      if (historyParam) {
+        try {
+          var incomingHist = JSON.parse(decodeURIComponent(historyParam));
+          var targetEmail = emailParam;
+          if (!targetEmail) {
+            try {
+              var rawAct = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+              var actObj = rawAct ? JSON.parse(rawAct) : null;
+              if (actObj && actObj.email) targetEmail = actObj.email;
+            } catch(ex){}
+          }
+          if (incomingHist && typeof incomingHist === 'object' && targetEmail) {
+            var histKey = 'crackit_history_' + targetEmail;
+            var existingHist = {};
+            try { existingHist = JSON.parse(localStorage.getItem(histKey) || '{}'); } catch(ex){}
+
+            var mergedHist = {
+              codingAttempts: mergeHistoryArrays(existingHist.codingAttempts, incomingHist.codingAttempts),
+              aptitudeAttempts: mergeHistoryArrays(existingHist.aptitudeAttempts, incomingHist.aptitudeAttempts),
+              interviewAttempts: mergeHistoryArrays(existingHist.interviewAttempts, incomingHist.interviewAttempts),
+              resumeActivity: mergeHistoryArrays(existingHist.resumeActivity, incomingHist.resumeActivity)
+            };
+            localStorage.setItem(histKey, JSON.stringify(mergedHist));
+            if (typeof renderAnalysisDashboard === 'function') {
+              renderAnalysisDashboard();
+            }
+          }
+        } catch(e){}
+      }
+
+      // Clean query parameters from address bar to prevent sticky query state on reload
+      if (window.history && window.history.replaceState && window.location.search) {
+        var cleanUrl = window.location.pathname + (window.location.hash || '');
+        window.history.replaceState(null, '', cleanUrl);
+      }
+    } catch(e){}
+  }
+
+  function buildNavUrl(targetPath, pageHash){
+    try {
+      var theme = (typeof getEffectiveTheme === 'function') ? getEffectiveTheme() : (localStorage.getItem('crackit-theme') || 'system');
+      var active = (typeof getActiveUser === 'function') ? getActiveUser() : null;
+      if (!active) {
+        try {
+          var rawActive = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+          active = rawActive ? JSON.parse(rawActive) : null;
+        } catch(e){}
+      }
+      var params = new URLSearchParams();
+      if (theme) params.set('theme', theme);
+
+      if (active && active.email) {
+        params.set('email', active.email);
+        if (active.name) params.set('name', active.name);
+        var prof = {};
+        try { prof = JSON.parse(localStorage.getItem('crackit_profile_' + active.email) || '{}'); } catch(e){}
+        if (prof.targetRole) params.set('role', prof.targetRole);
+        if (prof.college) params.set('college', prof.college);
+        if (prof.gradYear) params.set('gradYear', prof.gradYear);
+        if (prof.skills) params.set('skills', prof.skills);
+        if (prof.phone) params.set('phone', prof.phone);
+        if (prof.bio) params.set('bio', prof.bio);
+
+        var hist = {};
+        try { hist = JSON.parse(localStorage.getItem('crackit_history_' + active.email) || '{}'); } catch(e){}
+        if (hist && (
+          (hist.codingAttempts && hist.codingAttempts.length > 0) ||
+          (hist.aptitudeAttempts && hist.aptitudeAttempts.length > 0) ||
+          (hist.interviewAttempts && hist.interviewAttempts.length > 0) ||
+          (hist.resumeActivity && hist.resumeActivity.length > 0)
+        )) {
+          params.set('history', encodeURIComponent(JSON.stringify(hist)));
+        }
+      }
+      var uSet = localStorage.getItem('crackit_user_settings');
+      if (uSet) {
+        params.set('settings', encodeURIComponent(uSet));
+      }
+
+      var queryString = params.toString();
+      return targetPath + (queryString ? '?' + queryString : '') + (pageHash ? '#' + pageHash : '');
+    } catch(e){
+      return targetPath + (pageHash ? '#' + pageHash : '');
+    }
+  }
+
+  syncFromUrlParams();
+
+  /* ---------------- User Profile System ---------------- */
+  function getActiveUser(){
+    try {
+      var raw = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+      if (raw) return JSON.parse(raw);
+    } catch(e){}
+    return null;
+  }
+
+  function getUserProfile(email, fallbackUser){
+    if(!email) return null;
+    var active = fallbackUser || getActiveUser() || {};
+    var fallbackName = (active && active.name && active.name !== 'CrackIT' && active.name !== 'CrackIT Aspirant')
+                       ? active.name
+                       : (email ? email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, function(l){return l.toUpperCase();}) : 'User');
+    try {
+      var saved = JSON.parse(localStorage.getItem('crackit_profile_' + email));
+      if(saved && typeof saved === 'object'){
+        if(!saved.name || saved.name === 'CrackIT' || saved.name === 'CrackIT Aspirant'){
+          saved.name = fallbackName;
+          try { localStorage.setItem('crackit_profile_' + email, JSON.stringify(saved)); } catch(e){}
+        }
+        saved.email = saved.email || email;
+        saved.targetRole = saved.targetRole || '';
+        saved.college = saved.college || '';
+        saved.gradYear = saved.gradYear || '';
+        saved.skills = saved.skills || '';
+        saved.phone = saved.phone || '';
+        saved.bio = saved.bio || '';
+        return saved;
+      }
+    } catch(e){}
+
+    var freshProf = {
+      name: fallbackName,
+      email: email,
+      targetRole: '',
+      college: '',
+      gradYear: '',
+      skills: '',
+      phone: '',
+      bio: ''
+    };
+    try { localStorage.setItem('crackit_profile_' + email, JSON.stringify(freshProf)); } catch(e){}
+    return freshProf;
+  }
+
+  function saveUserProfile(profile){
+    if(!profile || !profile.email) return;
+    try {
+      localStorage.setItem('crackit_profile_' + profile.email, JSON.stringify(profile));
+      var active = getActiveUser();
+      if(active && active.email === profile.email){
+        active.name = profile.name;
+        localStorage.setItem('crackit_active_user', JSON.stringify(active));
+        localStorage.setItem('crackit-user', JSON.stringify(active));
+      }
+      var users = getUsers();
+      var idx = users.findIndex(function(u){ return u.email === profile.email; });
+      if(idx !== -1){
+        users[idx].name = profile.name;
+        localStorage.setItem('crackit_db_users', JSON.stringify(users));
+      }
+    } catch(e){}
+  }
+
+  function renderProfilePage(){
+    var active = getActiveUser();
+    if(!active || !active.email) return;
+    var prof = getUserProfile(active.email, active);
+    if(!prof) return;
+
+    var resolvedName = (active.name && active.name !== 'CrackIT' && active.name !== 'CrackIT Aspirant')
+                       ? active.name
+                       : ((prof.name && prof.name !== 'CrackIT' && prof.name !== 'CrackIT Aspirant') ? prof.name : '');
+    if(!resolvedName && active.email){
+      resolvedName = active.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, function(l){return l.toUpperCase();});
+    }
+    if(!resolvedName) resolvedName = 'User';
+
+    var first = resolvedName.trim().split(/\s+/)[0];
+    var ini = first.charAt(0).toUpperCase();
+
+    var cardAvatar = document.getElementById('profileCardAvatar');
+    if(cardAvatar) cardAvatar.textContent = ini;
+    var cardName = document.getElementById('profileCardName');
+    if(cardName) cardName.textContent = resolvedName;
+    var cardEmail = document.getElementById('profileCardEmail');
+    if(cardEmail) cardEmail.textContent = prof.email;
+    var roleVal = document.getElementById('profileValRole');
+    if(roleVal) roleVal.textContent = prof.targetRole || 'Not set';
+    var collVal = document.getElementById('profileValCollege');
+    if(collVal) collVal.textContent = prof.college || 'Not set';
+    var gradVal = document.getElementById('profileValGradYear');
+    if(gradVal) gradVal.textContent = prof.gradYear || 'Not set';
+    var skillsVal = document.getElementById('profileValSkills');
+    if(skillsVal) skillsVal.textContent = prof.skills || 'Not set';
+    var phoneVal = document.getElementById('profileValPhone');
+    if(phoneVal) phoneVal.textContent = prof.phone || 'Not set';
+    var bioVal = document.getElementById('profileValBio');
+    if(bioVal) bioVal.textContent = prof.bio || 'Not set';
+
+    document.getElementById('topName').textContent = first;
+    document.getElementById('topAvatar').textContent = ini;
+    var ddName = document.getElementById('ddName');
+    if(ddName) ddName.textContent = resolvedName;
+    var ddRole = document.getElementById('ddRole');
+    if(ddRole) ddRole.textContent = prof.targetRole || 'Placement Aspirant';
+
+    var eName = document.getElementById('editProfileName');
+    if(eName) eName.value = resolvedName;
+    if(eName) eName.value = prof.name || '';
+    var eRole = document.getElementById('editProfileRole');
+    if(eRole) eRole.value = prof.targetRole || '';
+    var eColl = document.getElementById('editProfileCollege');
+    if(eColl) eColl.value = prof.college || '';
+    var eGrad = document.getElementById('editProfileGradYear');
+    if(eGrad) eGrad.value = prof.gradYear || '';
+    var eSkills = document.getElementById('editProfileSkills');
+    if(eSkills) eSkills.value = prof.skills || '';
+    var ePhone = document.getElementById('editProfilePhone');
+    if(ePhone) ePhone.value = prof.phone || '';
+    var eBio = document.getElementById('editProfileBio');
+    if(eBio) eBio.value = prof.bio || '';
+
+    var viewCard = document.getElementById('profileViewCard');
+    var editBox = document.getElementById('profileEditBox');
+    if(viewCard) viewCard.style.display = 'block';
+    if(editBox) editBox.style.display = 'none';
+  }
+
+  var btnEditProfile = document.getElementById('btnEditProfile');
+  var btnCancelEditProfile = document.getElementById('btnCancelEditProfile');
+  var profileEditForm = document.getElementById('profileEditForm');
+
+  if(btnEditProfile){
+    btnEditProfile.addEventListener('click', function(){
+      document.getElementById('profileViewCard').style.display = 'none';
+      document.getElementById('profileEditBox').style.display = 'block';
+    });
+  }
+
+  if(btnCancelEditProfile){
+    btnCancelEditProfile.addEventListener('click', function(){
+      document.getElementById('profileEditBox').style.display = 'none';
+      document.getElementById('profileViewCard').style.display = 'block';
+    });
+  }
+
+  if(profileEditForm){
+    profileEditForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var active = getActiveUser();
+      if(!active || !active.email) return;
+
+      var updated = {
+        name: document.getElementById('editProfileName').value.trim() || active.name || 'User',
+        email: active.email,
+        targetRole: document.getElementById('editProfileRole').value.trim() || 'Software Engineer',
+        college: document.getElementById('editProfileCollege').value.trim() || 'Not set',
+        gradYear: document.getElementById('editProfileGradYear').value.trim() || '2025',
+        skills: document.getElementById('editProfileSkills').value.trim() || 'Java, Python, DSA, SQL',
+        phone: document.getElementById('editProfilePhone').value.trim() || 'Not set',
+        bio: document.getElementById('editProfileBio').value.trim() || 'Aspiring engineer preparing for placement.'
+      };
+
+      saveUserProfile(updated);
+      renderProfilePage();
+      showToast('Profile updated and saved successfully! ✓', true);
+    });
+  }
+
+  /* ---------------- History & Analysis Dashboard ---------------- */
+  function getUserHistory(email){
+    if(!email) return { codingAttempts: [], aptitudeAttempts: [], interviewAttempts: [], resumeActivity: [] };
+    try {
+      var saved = JSON.parse(localStorage.getItem('crackit_history_' + email));
+      if(saved && typeof saved === 'object'){
+        return {
+          codingAttempts: Array.isArray(saved.codingAttempts) ? saved.codingAttempts : [],
+          aptitudeAttempts: Array.isArray(saved.aptitudeAttempts) ? saved.aptitudeAttempts : [],
+          interviewAttempts: Array.isArray(saved.interviewAttempts) ? saved.interviewAttempts : [],
+          resumeActivity: Array.isArray(saved.resumeActivity) ? saved.resumeActivity : []
+        };
+      }
+    } catch(e){}
+    return { codingAttempts: [], aptitudeAttempts: [], interviewAttempts: [], resumeActivity: [] };
+  }
+
+  function renderAnalysisDashboard(){
+    try {
+    var active = getActiveUser();
+    if(!active || !active.email) return;
+
+    var history = getUserHistory(active.email);
+    var codingList = history.codingAttempts || [];
+    var aptitudeList = history.aptitudeAttempts || [];
+    var interviewList = history.interviewAttempts || [];
+    var resumeList = history.resumeActivity || [];
+
+    var allAttempts = [];
+    codingList.forEach(function(item){ allAttempts.push(Object.assign({ moduleType: 'coding', icon: '💻', color: '#5457D9' }, item)); });
+    aptitudeList.forEach(function(item){ allAttempts.push(Object.assign({ moduleType: 'aptitude', icon: '🧮', color: '#10b981' }, item)); });
+    interviewList.forEach(function(item){ allAttempts.push(Object.assign({ moduleType: 'interview', icon: '🎤', color: '#3b82f6' }, item)); });
+    resumeList.forEach(function(item){ allAttempts.push(Object.assign({ moduleType: 'resume', icon: '📄', color: '#f59e0b' }, item)); });
+
+    allAttempts.sort(function(a, b){ return (a.timestamp || 0) - (b.timestamp || 0); });
+
+    var scoredAttempts = allAttempts.filter(function(a){ return typeof a.score === 'number' && !isNaN(a.score); });
+    var totalAssessments = scoredAttempts.length;
+
+    var avgScore = 0;
+    if(totalAssessments > 0){
+      var sumScores = scoredAttempts.reduce(function(acc, x){ return acc + x.score; }, 0);
+      avgScore = Math.round(sumScores / totalAssessments);
+    }
+
+    var accuracyList = [];
+    aptitudeList.forEach(function(a){ if(typeof a.accuracy === 'number') accuracyList.push(a.accuracy); });
+    codingList.forEach(function(c){ if(c.totalCases > 0) accuracyList.push(Math.round((c.passedCases / c.totalCases) * 100)); });
+    interviewList.forEach(function(i){ if(typeof i.score === 'number') accuracyList.push(i.score); });
+    
+    var overallAccuracy = accuracyList.length > 0 ? Math.round(accuracyList.reduce(function(s, x){ return s + x; }, 0) / accuracyList.length) : (avgScore || 0);
+
+    var readiness = 0;
+    if(totalAssessments === 0){
+      readiness = 0;
+    } else {
+      var moduleCoverage = (codingList.length > 0 ? 25 : 0) + (aptitudeList.length > 0 ? 25 : 0) + (interviewList.length > 0 ? 25 : 0) + (resumeList.length > 0 ? 25 : 0);
+      readiness = Math.min(100, Math.round(avgScore * 0.6 + moduleCoverage * 0.4));
+    }
+
+    function setEl(id, val){ var el = document.getElementById(id); if(el) el.textContent = val; }
+    setEl('kpiReadiness', totalAssessments > 0 ? readiness + '%' : '--%');
+    setEl('kpiTotalTests', totalAssessments);
+    setEl('kpiAvgScore', totalAssessments > 0 ? avgScore + '%' : '--%');
+    setEl('kpiAccuracy', totalAssessments > 0 ? overallAccuracy + '%' : '--%');
+
+    var trendBadge = document.getElementById('trendIndicatorBadge');
+    var trendCard = document.getElementById('trendComparisonCard');
+
+    if(totalAssessments >= 2){
+      var latest = scoredAttempts[scoredAttempts.length - 1];
+      var prevList = scoredAttempts.slice(0, scoredAttempts.length - 1);
+      var prevAvg = Math.round(prevList.reduce(function(acc, x){ return acc + x.score; }, 0) / prevList.length);
+      var diff = latest.score - prevAvg;
+
+      if(diff > 2){
+        trendBadge.innerHTML = '🟢 Improving 🚀 (+' + diff + '%)';
+        trendBadge.style.background = '#dcfce7';
+        trendBadge.style.color = '#15803d';
+        trendCard.innerHTML = '<div style="display:flex; align-items:center; gap:16px;">' +
+          '<span style="font-size:36px;">🚀</span>' +
+          '<div>' +
+            '<h3 style="margin:0 0 4px; font-size:16.5px; color:#15803d;">Performance Trajectory: Improving (+ ' + diff + '%)</h3>' +
+            '<p style="margin:0; font-size:13.5px; color:var(--text-muted); line-height:1.5;">' +
+              'Your latest <strong>' + latest.module + '</strong> assessment scored <strong>' + latest.score + '%</strong>, outperforming your prior average of ' + prevAvg + '%. Keep building your consistency!' +
+            '</p>' +
+          '</div>' +
+        '</div>';
+      } else if(diff < -2){
+        trendBadge.innerHTML = '🔴 Needs Practice 📉 (' + diff + '%)';
+        trendBadge.style.background = '#fee2e2';
+        trendBadge.style.color = '#b91c1c';
+        trendCard.innerHTML = '<div style="display:flex; align-items:center; gap:16px;">' +
+          '<span style="font-size:36px;">📉</span>' +
+          '<div>' +
+            '<h3 style="margin:0 0 4px; font-size:16.5px; color:#b91c1c;">Performance Trajectory: Declining (' + diff + '%)</h3>' +
+            '<p style="margin:0; font-size:13.5px; color:var(--text-muted); line-height:1.5;">' +
+              'Your latest <strong>' + latest.module + '</strong> assessment score of <strong>' + latest.score + '%</strong> dipped below your historical average (' + prevAvg + '%). Review weak topics in the analysis breakdown below before attempting again.' +
+            '</p>' +
+          '</div>' +
+        '</div>';
+      } else {
+        trendBadge.innerHTML = '🔵 Maintaining Performance ⚖️';
+        trendBadge.style.background = '#dbeafe';
+        trendBadge.style.color = '#1d4ed8';
+        trendCard.innerHTML = '<div style="display:flex; align-items:center; gap:16px;">' +
+          '<span style="font-size:36px;">⚖️</span>' +
+          '<div>' +
+            '<h3 style="margin:0 0 4px; font-size:16.5px; color:#1d4ed8;">Performance Trajectory: Consistent & Stable</h3>' +
+            '<p style="margin:0; font-size:13.5px; color:var(--text-muted); line-height:1.5;">' +
+              'Your recent <strong>' + latest.module + '</strong> score (<strong>' + latest.score + '%</strong>) matches your consistent platform baseline (' + prevAvg + '%). Challenge yourself with higher difficulty questions to elevate your placement readiness.' +
+            '</p>' +
+          '</div>' +
+        '</div>';
+      }
+    } else if(totalAssessments === 1){
+      var one = scoredAttempts[0];
+      trendBadge.innerHTML = '🟢 Baseline Set 📍';
+      trendBadge.style.background = '#dcfce7';
+      trendBadge.style.color = '#15803d';
+      trendCard.innerHTML = '<div style="display:flex; align-items:center; gap:16px;">' +
+        '<span style="font-size:36px;">📍</span>' +
+        '<div>' +
+          '<h3 style="margin:0 0 4px; font-size:16.5px; color:var(--text);">First Assessment Completed (' + one.module + ' — ' + one.score + '%)</h3>' +
+          '<p style="margin:0; font-size:13.5px; color:var(--text-muted); line-height:1.5;">' +
+            'Initial baseline established! Complete assessments across Coding, Aptitude, and Mock Interviews to generate comparative trend analysis and trajectory graphs.' +
+          '</p>' +
+        '</div>' +
+      '</div>';
+    } else {
+      trendBadge.innerHTML = '⚪ No Assessments Yet';
+      trendBadge.style.background = 'var(--track-bg)';
+      trendBadge.style.color = 'var(--text-muted)';
+      trendCard.innerHTML = '<div style="display:flex; align-items:center; gap:16px;">' +
+        '<span style="font-size:36px;">🎯</span>' +
+        '<div>' +
+          '<h3 style="margin:0 0 4px; font-size:16.5px; color:var(--text);">Ready to Begin Your Placement Preparation?</h3>' +
+          '<p style="margin:0; font-size:13.5px; color:var(--text-muted); line-height:1.5;">' +
+            'Attempt your first Coding challenge, Aptitude test, or Mock Interview. All your scores, strengths, and historical progress will be tracked right here.' +
+          '</p>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // Coding Breakdown Card
+    var badgeCoding = document.getElementById('badgeCodingStatus');
+    var codingSolved = document.getElementById('codingSolvedVal');
+    var codingCases = document.getElementById('codingCasesVal');
+    var codingAvg = document.getElementById('codingAvgVal');
+    if(codingList.length > 0){
+      badgeCoding.textContent = codingList.length + ' Tests Taken';
+      badgeCoding.style.background = '#dcfce7';
+      badgeCoding.style.color = '#15803d';
+      var totalSolved = codingList.reduce(function(acc, x){ return acc + (x.solvedCount || 0); }, 0);
+      var totalProblems = codingList.reduce(function(acc, x){ return acc + (x.totalCount || 0); }, 0);
+      var passedCases = codingList.reduce(function(acc, x){ return acc + (x.passedCases || 0); }, 0);
+      var totalCases = codingList.reduce(function(acc, x){ return acc + (x.totalCases || 0); }, 0);
+      var avgCodeScore = Math.round(codingList.reduce(function(acc, x){ return acc + x.score; }, 0) / codingList.length);
+      codingSolved.textContent = totalSolved + ' / ' + totalProblems;
+      codingCases.textContent = passedCases + ' / ' + totalCases;
+      codingAvg.textContent = avgCodeScore + '%';
+    } else {
+      badgeCoding.textContent = 'Not Started';
+      badgeCoding.style.background = 'var(--badge-bg)';
+      badgeCoding.style.color = 'var(--badge-text)';
+      codingSolved.textContent = '0 / 0';
+      codingCases.textContent = '0 / 0';
+      codingAvg.textContent = '--%';
+    }
+
+    // Aptitude Breakdown Card
+    var badgeAptitude = document.getElementById('badgeAptitudeStatus');
+    var aptTests = document.getElementById('aptitudeTestsVal');
+    var aptAvg = document.getElementById('aptitudeAvgVal');
+    var aptAccuracy = document.getElementById('aptitudeAccuracyVal');
+    if(aptitudeList.length > 0){
+      badgeAptitude.textContent = aptitudeList.length + ' Tests Taken';
+      badgeAptitude.style.background = '#dcfce7';
+      badgeAptitude.style.color = '#15803d';
+      var aptAvgScore = Math.round(aptitudeList.reduce(function(acc, x){ return acc + x.score; }, 0) / aptitudeList.length);
+      var aptAcc = Math.round(aptitudeList.reduce(function(acc, x){ return acc + (x.accuracy || x.score); }, 0) / aptitudeList.length);
+      aptTests.textContent = aptitudeList.length;
+      aptAvg.textContent = aptAvgScore + '%';
+      aptAccuracy.textContent = aptAcc + '%';
+    } else {
+      badgeAptitude.textContent = 'Not Started';
+      badgeAptitude.style.background = 'var(--badge-bg)';
+      badgeAptitude.style.color = 'var(--badge-text)';
+      aptTests.textContent = '0';
+      aptAvg.textContent = '--%';
+      aptAccuracy.textContent = '--%';
+    }
+
+    // Interview Breakdown Card
+    var badgeInterview = document.getElementById('badgeInterviewStatus');
+    var intCount = document.getElementById('interviewCountVal');
+    var intAvg = document.getElementById('interviewAvgVal');
+    var intRole = document.getElementById('interviewRoleVal');
+    if(interviewList.length > 0){
+      badgeInterview.textContent = interviewList.length + ' Completed';
+      badgeInterview.style.background = '#dcfce7';
+      badgeInterview.style.color = '#15803d';
+      var intAvgScore = Math.round(interviewList.reduce(function(acc, x){ return acc + x.score; }, 0) / interviewList.length);
+      var latestRole = interviewList[interviewList.length - 1].role || 'Software Developer';
+      intCount.textContent = interviewList.length;
+      intAvg.textContent = intAvgScore + '%';
+      intRole.textContent = latestRole;
+    } else {
+      badgeInterview.textContent = 'Not Started';
+      badgeInterview.style.background = 'var(--badge-bg)';
+      badgeInterview.style.color = 'var(--badge-text)';
+      intCount.textContent = '0';
+      intAvg.textContent = '--%';
+      intRole.textContent = 'General';
+    }
+
+    // Areas for Improvement (Calculated dynamically from submitted assessments)
+    var weaknessesEl = document.getElementById('analysisWeaknessesList');
+    var contextBadge = document.getElementById('improvementContextBadge');
+    var weaknesses = [];
+
+    // 1. Coding Assessment Insights
+    if(codingList.length > 0){
+      var totalCodingTests = codingList.length;
+      var avgCodeScore = Math.round(codingList.reduce(function(acc, x){ return acc + x.score; }, 0) / totalCodingTests);
+      var totalSolved = codingList.reduce(function(acc, x){ return acc + (x.solvedCount || 0); }, 0);
+      var totalProblems = codingList.reduce(function(acc, x){ return acc + (x.totalCount || 0); }, 0);
+      var passedCases = codingList.reduce(function(acc, x){ return acc + (x.passedCases || 0); }, 0);
+      var totalCases = codingList.reduce(function(acc, x){ return acc + (x.totalCases || 0); }, 0);
+      var casePassRate = totalCases > 0 ? Math.round((passedCases / totalCases) * 100) : 0;
+
+      if(totalCases > 0 && passedCases < totalCases){
+        weaknesses.push({
+          tag: 'Coding',
+          title: 'Hidden Test Cases & Boundary Constraints',
+          desc: 'Passed ' + passedCases + ' of ' + totalCases + ' test cases (' + casePassRate + '% pass rate across ' + totalCodingTests + ' attempt' + (totalCodingTests > 1 ? 's' : '') + '). Solutions fail unexpected boundary values (e.g. empty inputs, zero, extreme values, or off-by-one loops). Always dry-run boundary edge cases before submitting.'
+        });
+      }
+
+      if(avgCodeScore === 0){
+        weaknesses.push({
+          tag: 'Coding',
+          title: 'Code Execution & Output Formatting',
+          desc: 'Average coding score is currently 0% across ' + totalCodingTests + ' attempt' + (totalCodingTests > 1 ? 's' : '') + '. Ensure your solution matches the required function return signature, handles edge constraints without runtime crashes, and produces standard output without extra prints.'
+        });
+      } else if(avgCodeScore < 60){
+        weaknesses.push({
+          tag: 'Coding',
+          title: 'Algorithm & Data Structure Selection',
+          desc: 'Solved ' + totalSolved + ' of ' + totalProblems + ' problems (average score ' + avgCodeScore + '%). Practice high-frequency patterns: Arrays & Two Pointers, Hash Maps for O(1) lookups, and Binary Search to conquer coding rounds.'
+        });
+      } else if(avgCodeScore < 85){
+        weaknesses.push({
+          tag: 'Coding',
+          title: 'Time & Space Complexity Optimization',
+          desc: 'Average coding score is ' + avgCodeScore + '%. Optimize brute-force O(N²) solutions toward O(N log N) or O(N) using optimal data structures to prevent Time Limit Exceeded (TLE) on large inputs.'
+        });
+      }
+    } else {
+      weaknesses.push({
+        tag: 'Coding',
+        title: 'Pending Coding Round',
+        desc: 'No coding assessments submitted yet. Technical screening in campus placements requires solving 1–2 programming problems. Attempt a practice challenge to diagnose your coding proficiency.'
+      });
+    }
+
+    // 2. Aptitude Assessment Insights
+    if(aptitudeList.length > 0){
+      var totalAptTests = aptitudeList.length;
+      var avgAptScore = Math.round(aptitudeList.reduce(function(acc, x){ return acc + x.score; }, 0) / totalAptTests);
+      var totalCorrect = aptitudeList.reduce(function(acc, x){ return acc + (x.correctCount || 0); }, 0);
+      var totalWrong = aptitudeList.reduce(function(acc, x){ return acc + (x.wrongCount || 0); }, 0);
+      var totalUnanswered = aptitudeList.reduce(function(acc, x){ return acc + (x.unansweredCount || 0); }, 0);
+      var totalAptQues = aptitudeList.reduce(function(acc, x){ return acc + (x.totalQuestions || 0); }, 0);
+      var avgAccuracy = Math.round(aptitudeList.reduce(function(acc, x){ return acc + (x.accuracy || x.score || 0); }, 0) / totalAptTests);
+
+      if(totalUnanswered > 0){
+        weaknesses.push({
+          tag: 'Aptitude',
+          title: 'Time Management & Question Pacing',
+          desc: 'Left a cumulative total of ' + totalUnanswered + ' question' + (totalUnanswered > 1 ? 's' : '') + ' unanswered across ' + totalAptTests + ' assessment' + (totalAptTests > 1 ? 's' : '') + '. Spend at most 60–90 seconds per question. Skip lengthy calculations early and come back to them at the end.'
+        });
+      }
+
+      if(totalWrong > 0 || avgAccuracy < 75){
+        weaknesses.push({
+          tag: 'Aptitude',
+          title: 'Accuracy & Core Concept Revision',
+          desc: 'Answered ' + totalWrong + ' question' + (totalWrong > 1 ? 's' : '') + ' incorrectly (average accuracy ' + avgAccuracy + '%, score ' + avgAptScore + '%). Review missed questions in the Detailed Question Review to eliminate recurring conceptual errors in percentages, profit & loss, and syllogisms.'
+        });
+      } else if(avgAptScore < 85){
+        weaknesses.push({
+          tag: 'Aptitude',
+          title: 'Speed Building Under Timed Pressure',
+          desc: 'Aptitude accuracy is solid at ' + avgAccuracy + '%. Train under Rapid Practice (15 minutes) to sharpen your mental math and quick calculation shortcuts for fast-paced corporate aptitude tests.'
+        });
+      }
+    } else {
+      weaknesses.push({
+        tag: 'Aptitude',
+        title: 'Pending Aptitude Round',
+        desc: 'No aptitude assessments submitted yet. Aptitude is the initial elimination test for over 90% of IT and product companies. Complete a practice assessment to benchmark your quantitative and logical reasoning.'
+      });
+    }
+
+    // 3. AI Mock Interview Insights
+    if(interviewList.length > 0){
+      var totalIntTests = interviewList.length;
+      var avgIntScore = Math.round(interviewList.reduce(function(acc, x){ return acc + x.score; }, 0) / totalIntTests);
+      var avgKnowledge = Math.round(interviewList.reduce(function(acc, x){ return acc + (x.knowledgeScore || x.score || 0); }, 0) / totalIntTests);
+      var avgClarity = Math.round(interviewList.reduce(function(acc, x){ return acc + (x.clarityScore || x.score || 0); }, 0) / totalIntTests);
+      var avgComm = Math.round(interviewList.reduce(function(acc, x){ return acc + (x.commScore || x.score || 0); }, 0) / totalIntTests);
+      var avgRelevance = Math.round(interviewList.reduce(function(acc, x){ return acc + (x.relevanceScore || x.score || 0); }, 0) / totalIntTests);
+      var targetRole = interviewList[interviewList.length - 1].role || 'Software Developer';
+
+      if(avgKnowledge < 70){
+        weaknesses.push({
+          tag: 'Interview',
+          title: 'Technical Depth & Internal Mechanics',
+          desc: 'Technical knowledge score averaged ' + avgKnowledge + '% for ' + targetRole + '. Provide deeper technical explanations with specific architectural trade-offs, internal mechanics, and real-world implementation details rather than high-level summaries.'
+        });
+      }
+
+      if(avgClarity < 70 || avgComm < 70){
+        weaknesses.push({
+          tag: 'Interview',
+          title: 'Structured Delivery & Communication Clarity',
+          desc: 'Answer clarity and articulation averaged ' + avgClarity + '%. Structure scenario and behavioral questions using the STAR framework (Situation, Task, Action, Result) for sharp, concise delivery.'
+        });
+      }
+
+      if(avgRelevance < 70){
+        weaknesses.push({
+          tag: 'Interview',
+          title: 'Direct Question Relevance',
+          desc: 'Response relevance averaged ' + avgRelevance + '%. Address the interviewer\'s core question directly in the opening 20 seconds before expanding on background context.'
+        });
+      }
+
+      if(avgKnowledge >= 70 && avgClarity >= 70 && avgRelevance >= 70 && avgIntScore < 85){
+        weaknesses.push({
+          tag: 'Interview',
+          title: 'Senior-Level Follow-Up Scenarios',
+          desc: 'Solid communication baseline (' + avgIntScore + '% avg). Practice answering deeper follow-up questions on system scalability, concurrency edge cases, and failure recovery.'
+        });
+      }
+    } else {
+      weaknesses.push({
+        tag: 'Interview',
+        title: 'Verbal Mock Interview Practice',
+        desc: 'No AI mock interviews completed yet. Practice answering verbal technical and behavioral questions out loud with the AI interviewer to build speech confidence and receive clarity feedback.'
+      });
+    }
+
+    // 4. Trend & Consistency Insight
+    if(scoredAttempts.length >= 2){
+      var latestAttempt = scoredAttempts[scoredAttempts.length - 1];
+      var priorAttempts = scoredAttempts.slice(0, scoredAttempts.length - 1);
+      var priorAvg = Math.round(priorAttempts.reduce(function(acc, x){ return acc + x.score; }, 0) / priorAttempts.length);
+      if(latestAttempt.score < priorAvg - 3){
+        weaknesses.push({
+          tag: 'Performance Trend',
+          title: 'Recent Performance Dip',
+          desc: 'Your most recent ' + latestAttempt.module + ' assessment score of ' + latestAttempt.score + '% dropped below your previous baseline of ' + priorAvg + '%. Retake this assessment with focused preparation to stabilize your score trajectory.'
+        });
+      }
+    }
+
+    // 5. Preparation Coverage Balance
+    var attemptedModulesCount = (codingList.length > 0 ? 1 : 0) + (aptitudeList.length > 0 ? 1 : 0) + (interviewList.length > 0 ? 1 : 0);
+    if(scoredAttempts.length >= 3 && attemptedModulesCount < 3){
+      var missingModules = [];
+      if(codingList.length === 0) missingModules.push('Coding');
+      if(aptitudeList.length === 0) missingModules.push('Aptitude');
+      if(interviewList.length === 0) missingModules.push('AI Mock Interview');
+      weaknesses.push({
+        tag: 'Preparation Balance',
+        title: 'Multi-Round Preparation Gap',
+        desc: 'You have submitted ' + scoredAttempts.length + ' assessments but haven\'t attempted ' + missingModules.join(' & ') + '. Campus placement drives require passing both aptitude screening and coding/interview rounds consecutively.'
+      });
+    }
+
+    if(contextBadge){
+      contextBadge.textContent = scoredAttempts.length > 0 ? 'Based on ' + scoredAttempts.length + ' submitted assessment records' : 'Awaiting assessment submissions';
+    }
+
+    if(weaknessesEl){
+      if(weaknesses.length === 0){
+        weaknessesEl.innerHTML = '<div style="padding:16px; background:var(--track-bg); border-radius:10px; font-size:13.5px; color:var(--text-muted); text-align:center;">' +
+          '🎉 Outstanding performance across all submitted assessments! Retake assessments under harder time constraints to maintain peak placement readiness.' +
+        '</div>';
+      } else {
+        var badgeColorMap = {
+          'Coding': { bg: 'rgba(84, 87, 217, 0.12)', color: '#5457D9' },
+          'Aptitude': { bg: 'rgba(16, 185, 129, 0.12)', color: '#059669' },
+          'Interview': { bg: 'rgba(59, 130, 246, 0.12)', color: '#2563eb' },
+          'Performance Trend': { bg: 'rgba(239, 68, 68, 0.12)', color: '#dc2626' },
+          'Preparation Balance': { bg: 'rgba(245, 158, 11, 0.12)', color: '#d97706' }
+        };
+
+        var html = '<div style="display:flex; flex-direction:column; gap:12px;">';
+        weaknesses.forEach(function(item){
+          var style = badgeColorMap[item.tag] || { bg: 'var(--border)', color: 'var(--text)' };
+          html += '<div style="background:var(--track-bg); border:1px solid var(--border); border-left:4px solid ' + style.color + '; border-radius:10px; padding:14px 18px;">' +
+            '<div style="display:flex; align-items:center; gap:8px; margin-bottom:5px; flex-wrap:wrap;">' +
+              '<span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; background:' + style.bg + '; color:' + style.color + '; padding:3px 8px; border-radius:6px;">' + item.tag + '</span>' +
+              '<strong style="font-size:14px; color:var(--text);">' + item.title + '</strong>' +
+            '</div>' +
+            '<p style="margin:0; font-size:13px; color:var(--text-muted); line-height:1.55;">' + item.desc + '</p>' +
+          '</div>';
+        });
+        html += '</div>';
+        weaknessesEl.innerHTML = html;
+      }
+    }
+
+    // SVG Score Progress Chart
+    var chartContainer = document.getElementById('analysisChartContainer');
+    if(scoredAttempts.length === 0){
+      chartContainer.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; text-align:center; color:var(--text-muted);">' +
+        '<span style="font-size:38px; margin-bottom:10px;">📈</span>' +
+        '<strong style="font-size:15px; color:var(--text);">No Progress Trajectory Yet</strong>' +
+        '<p style="font-size:13px; max-width:440px; margin:6px 0 0;">Complete assessments in Coding, Aptitude, or Mock Interview to generate your visual progress chart across attempts.</p>' +
+      '</div>';
+    } else {
+      var svgW = 760;
+      var svgH = 220;
+      var padLeft = 45;
+      var padRight = 35;
+      var padTop = 25;
+      var padBottom = 35;
+      var plotW = svgW - padLeft - padRight;
+      var plotH = svgH - padTop - padBottom;
+
+      var svg = '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%; height:auto; overflow:visible; font-family:Inter,sans-serif;">';
+
+      [0, 25, 50, 75, 100].forEach(function(val){
+        var y = padTop + plotH - (val / 100) * plotH;
+        svg += '<line x1="' + padLeft + '" y1="' + y + '" x2="' + (svgW - padRight) + '" y2="' + y + '" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" />';
+        svg += '<text x="' + (padLeft - 8) + '" y="' + (y + 4) + '" font-size="11" fill="var(--text-muted)" text-anchor="end">' + val + '%</text>';
+      });
+
+      var points = [];
+      var nPts = scoredAttempts.length;
+      scoredAttempts.forEach(function(att, idx){
+        var x = nPts === 1 ? (padLeft + plotW / 2) : (padLeft + (idx / (nPts - 1)) * plotW);
+        var y = padTop + plotH - (att.score / 100) * plotH;
+        points.push({ x: x, y: y, item: att, idx: idx + 1 });
+      });
+
+      if(points.length > 1){
+        var polylinePoints = points.map(function(p){ return p.x + ',' + p.y; }).join(' ');
+        svg += '<polyline points="' + polylinePoints + '" fill="none" stroke="#5457D9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />';
+      }
+
+      points.forEach(function(p){
+        var dotColor = p.item.color || '#5457D9';
+        svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="5.5" fill="' + dotColor + '" stroke="#fff" stroke-width="2"><title>' + p.item.module + ': ' + p.item.score + '% (' + (p.item.dateStr || '') + ')</title></circle>';
+        svg += '<text x="' + p.x + '" y="' + (p.y - 10) + '" font-size="11.5" font-weight="700" fill="var(--text)" text-anchor="middle">' + p.item.score + '%</text>';
+        svg += '<text x="' + p.x + '" y="' + (svgH - 12) + '" font-size="11" fill="var(--text-muted)" text-anchor="middle">#' + p.idx + '</text>';
+      });
+
+      svg += '</svg>';
+      chartContainer.innerHTML = svg;
+    }
+
+    // Complete Attempt History Table
+    var historyCountEl = document.getElementById('attemptHistoryCount');
+    var historyBodyEl = document.getElementById('analysisHistoryBody');
+    var historyRev = allAttempts.slice().reverse();
+
+    if(historyRev.length === 0){
+      historyCountEl.textContent = '0 records found';
+      historyBodyEl.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:28px; color:var(--text-muted);">No attempts recorded yet. Start practicing from the sidebar or dashboard!</td></tr>';
+    } else {
+      historyCountEl.textContent = historyRev.length + ' records found';
+      var rowsHtml = '';
+      historyRev.forEach(function(rec){
+        var scoreStr = typeof rec.score === 'number' ? rec.score + '%' : '--';
+        var scoreColor = typeof rec.score === 'number' ? (rec.score >= 75 ? '#15803d' : (rec.score >= 50 ? '#b9720f' : '#dc2626')) : 'inherit';
+        
+        var origIdx = scoredAttempts.indexOf(rec);
+        var trendCell = '<span style="color:var(--text-muted); font-size:12px;">Baseline</span>';
+        if(origIdx > 0){
+          var prevScore = scoredAttempts[origIdx - 1].score;
+          var diff = rec.score - prevScore;
+          if(diff > 0){
+            trendCell = '<span style="color:#15803d; font-weight:700; font-size:12.5px;">+' + diff + '% ↑</span>';
+          } else if(diff < 0){
+            trendCell = '<span style="color:#dc2626; font-weight:700; font-size:12.5px;">' + diff + '% ↓</span>';
+          } else {
+            trendCell = '<span style="color:#1d4ed8; font-weight:600; font-size:12.5px;">Same (=)</span>';
+          }
+        }
+
+        rowsHtml += '<tr>' +
+          '<td><strong>' + (rec.icon || '📝') + ' ' + (rec.module || 'Assessment') + '</strong></td>' +
+          '<td><span style="font-size:12.5px; color:var(--text-muted);">' + (rec.dateStr || 'Recent') + '</span></td>' +
+          '<td><strong style="color:' + scoreColor + '; font-size:14px;">' + scoreStr + '</strong></td>' +
+          '<td style="font-size:13px; color:var(--text);">' + (rec.details || 'Standard assessment completed.') + '</td>' +
+          '<td>' + trendCell + '</td>' +
+        '</tr>';
+      });
+      historyBodyEl.innerHTML = rowsHtml;
+    }
+    } catch(analysisErr){ console.warn('Analysis render error:', analysisErr); }
+  }
+
+  /* ---------------- Topbar Dropdown Toggle ---------------- */
+  var profileWrap = document.getElementById('profileWrap');
+  var profileBtn = document.getElementById('profileBtn');
+  var profilePanel = document.getElementById('profilePanel');
+
+  if(profileBtn && profilePanel){
+    profileBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      profilePanel.classList.toggle('show');
+    });
+    document.addEventListener('click', function(e){
+      if(profileWrap && !profileWrap.contains(e.target)){
+        profilePanel.classList.remove('show');
+      }
+    });
+  }
+
+  /* ---------------- App Launch & Navigation ---------------- */
+  function launchApp(user){
+    loginScreen.style.display = 'none';
+    appShell.style.display = 'flex';
+
+    var prof = getUserProfile(user.email, user);
+    var resolvedName = (user.name && user.name !== 'CrackIT' && user.name !== 'CrackIT Aspirant')
+                       ? user.name
+                       : ((prof && prof.name && prof.name !== 'CrackIT' && prof.name !== 'CrackIT Aspirant') ? prof.name : '');
+    if(!resolvedName && user.email){
+      resolvedName = user.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, function(l){return l.toUpperCase();});
+    }
+    if(!resolvedName) resolvedName = 'User';
+
+    user.name = resolvedName;
+    try {
+      localStorage.setItem('crackit_active_user', JSON.stringify(user));
+      localStorage.setItem('crackit-user', JSON.stringify(user));
+    } catch(e){}
+
+    var firstName = resolvedName.trim().split(/\s+/)[0];
+    var ini = firstName.charAt(0).toUpperCase();
+
+    document.getElementById('topName').textContent = firstName;
+    document.getElementById('topAvatar').textContent = ini;
+    var ddName = document.getElementById('ddName');
+    if(ddName) ddName.textContent = resolvedName;
+    var ddRole = document.getElementById('ddRole');
+    if(ddRole) ddRole.textContent = (prof && prof.targetRole) ? prof.targetRole : 'Placement Aspirant';
+
+    document.getElementById('bannerHeading').textContent = 'Welcome to CrackIT, ' + firstName + '! 🚀';
+
+    if(user.email === ADMIN_EMAIL){
+      adminSessionCard.style.display = 'block';
+      renderLogs();
+    } else {
+      adminSessionCard.style.display = "none";
+    }
+
+    renderProfilePage();
+    renderAnalysisDashboard();
+  }
+
+  var pages = document.querySelectorAll('.page');
+  var navItems = document.querySelectorAll('.nav-item[data-page]');
+
+  function navigateTo(pageId){
+    if(profilePanel) profilePanel.classList.remove('show');
+
+    if(pageId === 'coding'){
+      window.location.href = buildNavUrl('../CrackIT_Coding_Module/crackit.html');
+      return;
+    }
+    if(pageId === 'aptitude'){
+      window.location.href = buildNavUrl('../CrackIT_Aptitude_Module/crackit.html');
+      return;
+    }
+    if(pageId === 'interview'){
+      window.location.href = buildNavUrl('interview.html');
+      return;
+    }
+    if(pageId === 'resume'){
+      window.location.href = buildNavUrl('resume.html');
+      return;
+    }
+
+    pages.forEach(function(p){ p.classList.toggle('active', p.id === 'page-' + pageId); });
+    navItems.forEach(function(n){ n.classList.toggle('active', n.dataset.page === pageId); });
+
+    if(pageId === 'profile'){
+      renderProfilePage();
+    } else if(pageId === 'analysis'){
+      renderAnalysisDashboard();
+    } else if(pageId === 'settings'){
+      renderSettingsPage();
+    }
+
+    var contentEl = document.querySelector('.content');
+    if(contentEl) contentEl.scrollTo({top:0, behavior:'instant'});
+  }
+
+  document.querySelectorAll('[data-page]').forEach(function(el){
+    el.addEventListener('click', function(){ navigateTo(el.dataset.page); });
+  });
+
+  var logoEl = document.querySelector('.sidebar .logo');
+  if(logoEl){
+    logoEl.style.cursor = 'pointer';
+    logoEl.addEventListener('click', function(){ navigateTo('dashboard'); });
+  }
+
+  // Logout Logic: clears active session, cleans URL parameters, and returns to login screen
+  function performLogout(){
+    try {
+      var rawActive = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+      if(rawActive){
+        var actObj = JSON.parse(rawActive);
+        if(actObj && actObj.email){
+          recordSession(actObj.email, "LOGOUT");
+        }
+      }
+    } catch(e){}
+
+    try {
+      localStorage.removeItem('crackit_active_user');
+      localStorage.removeItem('crackit-user');
+      sessionStorage.removeItem('crackit-user');
+      sessionStorage.removeItem('crackit_active_user');
+    } catch(e){}
+
+    if(loginPassword) loginPassword.value = '';
+    clearAlerts();
+
+    if(appShell) appShell.style.display = 'none';
+    if(loginScreen) loginScreen.style.display = 'flex';
+
+    // Strip URL search params & hash
+    var cleanPath = window.location.pathname;
+    try {
+      if(window.history && window.history.replaceState){
+        window.history.replaceState(null, '', cleanPath);
+      }
+    } catch(e){}
+
+    // Cleanly replace window location to avoid sticky cache/reload loops
+    window.location.replace(cleanPath);
+  }
+  window.performLogout = performLogout;
+
+  var logoutBtn = document.getElementById('logoutBtn');
+  if(logoutBtn){
+    logoutBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      performLogout();
+    });
+  }
+
+  var ddLogoutBtn = document.getElementById('ddLogoutBtn');
+  if(ddLogoutBtn){
+    ddLogoutBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      performLogout();
+    });
+  }
+
+  function handleHashRoute(){
+    var hash = window.location.hash ? window.location.hash.replace('#', '') : '';
+    if(hash && (hash === 'analysis' || hash === 'profile' || hash === 'settings' || hash === 'dashboard')){
+      navigateTo(hash);
+    }
+  }
+  window.addEventListener('hashchange', handleHashRoute);
+
+  // Persistence check on load
+  var activeSession = localStorage.getItem('crackit_active_user') || localStorage.getItem('crackit-user');
+  if(activeSession){
+    try {
+      var u = JSON.parse(activeSession);
+      if(u && u.email){
+        launchApp(u);
+        handleHashRoute();
+      }
+    } catch(e){}
+  }
+
+  // Expose key functions globally for inline onclick handlers
+  window.renderAnalysisDashboard = renderAnalysisDashboard;
+  window.showToast = showToast;
+
+})();
+</script>
+</body>
+</html>

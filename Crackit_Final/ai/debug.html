@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head><title>CrackIT Debug</title>
+<style>
+  body { font-family: monospace; padding: 20px; background: #111; color: #eee; }
+  .section { background: #1e1e1e; border: 1px solid #444; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .key { color: #7ec8e3; } .val { color: #98d982; } .err { color: #ff6b6b; }
+  h2 { color: #ffd700; margin: 0 0 12px; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+  button { background: #5457D9; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin: 4px; font-family: monospace; }
+  button:hover { background: #4345b0; }
+</style>
+</head>
+<body>
+<h1 style="color:#ffd700">🔍 CrackIT Debug Console</h1>
+
+<div class="section">
+  <h2>Actions</h2>
+  <button onclick="clearSession()">Clear Session Only (keep profiles)</button>
+  <button onclick="clearAll()">⚠️ Clear ALL Storage</button>
+  <button onclick="refresh()">Refresh</button>
+</div>
+
+<div class="section" id="output">Loading...</div>
+
+<script>
+function refresh() {
+  var html = '';
+
+  // Active user
+  var activeRaw = localStorage.getItem('crackit_active_user');
+  html += '<h2>Active Session (crackit_active_user)</h2>';
+  if (activeRaw) {
+    try { var u = JSON.parse(activeRaw); html += '<pre class="val">' + JSON.stringify(u, null, 2) + '</pre>'; }
+    catch(e) { html += '<pre class="err">PARSE ERROR: ' + activeRaw + '</pre>'; }
+  } else { html += '<pre class="err">NOT SET — no one is logged in</pre>'; }
+
+  // crackit-user (legacy)
+  var legacyRaw = localStorage.getItem('crackit-user');
+  html += '<h2>Legacy key (crackit-user)</h2>';
+  if (legacyRaw) {
+    try { var ul = JSON.parse(legacyRaw); html += '<pre class="val">' + JSON.stringify(ul, null, 2) + '</pre>'; }
+    catch(e) { html += '<pre class="err">PARSE ERROR: ' + legacyRaw + '</pre>'; }
+  } else { html += '<pre class="err">NOT SET</pre>'; }
+
+  // All users DB
+  var usersRaw = localStorage.getItem('crackit_db_users');
+  html += '<h2>User Database (crackit_db_users)</h2>';
+  if (usersRaw) {
+    try { var users = JSON.parse(usersRaw); html += '<pre class="val">' + JSON.stringify(users, null, 2) + '</pre>'; }
+    catch(e) { html += '<pre class="err">PARSE ERROR: ' + usersRaw + '</pre>'; }
+  } else { html += '<pre class="err">NOT SET — no accounts registered yet</pre>'; }
+
+  // Theme
+  html += '<h2>Theme (crackit-theme)</h2>';
+  var theme = localStorage.getItem('crackit-theme');
+  html += '<pre class="val">' + (theme || 'NOT SET (defaults to system)') + '</pre>';
+
+  // All crackit_ keys
+  html += '<h2>All crackit_ keys in localStorage</h2>';
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.indexOf('crackit') !== -1) keys.push(k);
+  }
+  if (keys.length === 0) { html += '<pre class="err">No crackit keys found</pre>'; }
+  else {
+    keys.sort();
+    keys.forEach(function(k) {
+      var v = localStorage.getItem(k);
+      var parsed = v;
+      try { parsed = JSON.stringify(JSON.parse(v), null, 2); } catch(e) {}
+      html += '<details><summary class="key">' + k + '</summary><pre class="val">' + parsed + '</pre></details><br>';
+    });
+  }
+
+  document.getElementById('output').innerHTML = html;
+}
+
+function clearSession() {
+  localStorage.removeItem('crackit_active_user');
+  localStorage.removeItem('crackit-user');
+  sessionStorage.clear();
+  alert('Session cleared. Profiles and history preserved.');
+  refresh();
+}
+
+function clearAll() {
+  if (confirm('This will delete ALL data including accounts, profiles and history. Continue?')) {
+    localStorage.clear();
+    sessionStorage.clear();
+    alert('All storage cleared.');
+    refresh();
+  }
+}
+
+refresh();
+</script>
+</body>
+</html>

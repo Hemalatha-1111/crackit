@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrackIT — Placement Preparation Platform</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-dark: #4338CA;
+      --bg: #F9FAFB;
+      --card-bg: #FFFFFF;
+      --text: #1F2937;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --track-bg: #F3F4F6;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+
+    /* ---------- Fullscreen Exam Mode ---------- */
+    body.exam-mode .sidebar,
+    body.exam-mode .sidebar-overlay,
+    body.exam-mode .topbar { display: none !important; }
+    body.exam-mode .app-shell { display: block; }
+    body.exam-mode .main { min-height: 100vh; }
+    body.exam-mode .content { max-width: 100%; padding: 16px 24px 40px; }
+    body.exam-mode .coding-workspace.active { min-height: calc(100vh - 60px); }
+
+    /* ---------- Layout & Cards ---------- */
+    .coding-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 24px; }
+    .coding-header h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .coding-header p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+
+    .difficulty-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .difficulty-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+
+    .difficulty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .difficulty-option { background: var(--track-bg); border: 2px solid transparent; border-radius: var(--radius-md); padding: 18px; cursor: pointer; transition: all 0.2s; }
+    .difficulty-option:hover { border-color: var(--primary); }
+    .difficulty-option.selected { background: #EEF2FF; border-color: var(--primary); }
+    .option-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; color: var(--text); }
+    .option-sub { font-size: 12px; color: var(--text-muted); }
+
+    .instructions-box { background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; }
+    .instructions-box h4 { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+    .instructions-box ul { padding-left: 20px; font-size: 13px; color: var(--text-muted); }
+    .instructions-box li { margin-bottom: 6px; }
+
+    .start-test-bar { display: flex; justify-content: space-between; align-items: center; }
+    .time-note { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 12px 24px; border-radius: var(--radius-md); font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: var(--track-bg); color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+
+    /* ---------- Workspace Layout ---------- */
+    .coding-workspace { display: none; gap: 20px; grid-template-columns: 1fr 1fr; }
+    .coding-workspace.active { display: grid; }
+    .coding-setup, .coding-result-card { display: none; }
+    .coding-setup.active, .coding-result-card.active { display: block; }
+
+    .workspace-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; }
+    .problem-panel { height: calc(100vh - 80px); overflow: hidden; }
+    .editor-panel { height: calc(100vh - 80px); }
+
+    .problem-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+    .diff-badge { background: #EEF2FF; color: var(--primary); }
+    .topic-badge { background: #F3F4F6; color: var(--text-muted); }
+    .test-timer { font-size: 18px; font-weight: 700; color: var(--primary); background: #EEF2FF; padding: 6px 14px; border-radius: 8px; }
+
+    .question-nav { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+    .q-pill { background: var(--track-bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .q-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .problem-scroll { overflow-y: auto; flex: 1; padding-right: 8px; }
+    .problem-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .problem-statement { font-size: 14px; color: var(--text); margin-bottom: 20px; white-space: pre-wrap; }
+    .meta-section { margin-bottom: 16px; }
+    .meta-section h4 { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+    .meta-section div { font-size: 13px; color: var(--text); background: #F8FAFC; padding: 10px; border-radius: 6px; border: 1px solid var(--border); white-space: pre-wrap; }
+
+    .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .lang-select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); font-weight: 600; font-size: 13px; background: #fff; cursor: pointer; }
+
+    .editor-area { flex: 1; margin-bottom: 12px; }
+    #codeEditor { width: 100%; height: 100%; min-height: 280px; background: #1E293B; color: #F8FAFC; font-family: "Courier New", Courier, monospace; font-size: 13px; padding: 14px; border-radius: 8px; border: none; resize: none; outline: none; line-height: 1.6; }
+
+    .results-area { background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+    .results-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+    .results-box { font-size: 12px; color: var(--text); max-height: 120px; overflow-y: auto; margin-bottom: 12px; font-family: monospace; white-space: pre-wrap; }
+    .submit-row { display: flex; justify-content: flex-end; }
+
+    /* ---------- Fullscreen Warning & Submit Modals ---------- */
+    .fs-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .55);
+      z-index: 9999; align-items: center; justify-content: center;
+    }
+    .fs-modal-overlay.show { display: flex; }
+    .fs-modal {
+      background: var(--card-bg, #fff); border: 1px solid var(--border, #e0e0e0);
+      border-radius: 14px; padding: 32px 30px; max-width: 460px; width: 90%;
+      text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+    }
+    .fs-modal h3 { font-size: 18px; font-weight: 700; margin: 0 0 12px; }
+    .fs-modal p { font-size: 14px; color: var(--text-muted, #666); line-height: 1.6; margin: 0 0 24px; }
+    .fs-modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .fs-modal-actions button {
+      padding: 12px 22px; border-radius: 11px; font-size: 14px; font-weight: 700;
+      border: none; cursor: pointer; min-width: 140px;
+    }
+    .fs-btn-primary { background: var(--primary, #4F46E5); color: #fff; }
+    .fs-btn-danger { background: #e0555f; color: #fff; }
+    .fs-btn-secondary { background: #f0f0f0; color: #333; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== CODING PAGE ==================== -->
+  <section class="page active" id="page-coding">
+    <!-- 1. CODING SETUP CARD (Difficulty selection) -->
+    <div class="coding-card coding-setup active" id="codingSetup">
+      <div class="coding-header">
+        <h2>Coding</h2>
+        <p>Practice programming problems with random question sets, a timer and instant test-case feedback.</p>
+      </div>
+
+      <div class="difficulty-card">
+        <div class="difficulty-header">
+          <h3>Start a Coding Test</h3>
+          <p>Choose a difficulty level. Your questions will be selected randomly and will include constraints, examples and hidden test cases.</p>
+        </div>
+
+        <div class="difficulty-grid" id="difficultyGrid">
+          <div class="difficulty-option" data-difficulty="Easy">
+            <div class="option-title">Easy</div>
+            <div class="option-sub">8 questions · 1 hour 30 minutes</div>
+          </div>
+          <div class="difficulty-option" data-difficulty="Medium">
+            <div class="option-title">Medium</div>
+            <div class="option-sub">5 questions · 1 hour 30 minutes</div>
+          </div>
+          <div class="difficulty-option" data-difficulty="Hard">
+            <div class="option-title">Hard</div>
+            <div class="option-sub">3 questions · 1 hour</div>
+          </div>
+          <div class="difficulty-option" data-difficulty="All">
+            <div class="option-title">All Levels</div>
+            <div class="option-sub">3 mixed questions · 1 hour</div>
+          </div>
+        </div>
+
+        <div class="instructions-box">
+          <h4>Instructions</h4>
+          <ul>
+            <li>Read the complete problem statement, constraints and examples before coding.</li>
+            <li>Use the coding editor to write a complete program using standard input and standard output.</li>
+            <li>Use <strong>Run Code</strong> to check your solution against the available test cases.</li>
+            <li>A question is considered solved only when all its test cases pass.</li>
+            <li>You can move between questions and edit your answers before submitting.</li>
+          </ul>
+        </div>
+
+        <div class="start-test-bar">
+          <div class="time-note" id="codingTimeNote">Select a level to see the test duration.</div>
+          <button class="btn-primary" id="startCodingTestBtn">Start Test</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CODING WORKSPACE (Exam View) -->
+    <div class="coding-workspace" id="codingWorkspace">
+      <div class="workspace-card problem-panel">
+        <div class="problem-topbar">
+          <div>
+            <span class="badge diff-badge" id="problemDifficulty">Medium</span>
+            <span class="badge topic-badge" id="problemTopic">Topic</span>
+          </div>
+          <div class="test-timer" id="codingTimer">90:00</div>
+        </div>
+
+        <div class="question-nav" id="questionNavPills">
+          <button class="q-pill" id="prevQuestionBtn">Previous</button>
+          <span id="questionCount" style="font-size:13px; font-weight:600; align-self:center;">Question 1 of 5</span>
+          <button class="q-pill" id="nextQuestionBtn">Next</button>
+        </div>
+
+        <div class="problem-scroll">
+          <h3 class="problem-title" id="problemTitle">Problem Title</h3>
+          <div class="problem-statement" id="problemStatement">Problem statement text...</div>
+
+          <div class="meta-section">
+            <h4>Input Format</h4>
+            <div id="problemInput">Format details...</div>
+          </div>
+          <div class="meta-section">
+            <h4>Output Format</h4>
+            <div id="problemOutput">Format details...</div>
+          </div>
+          <div class="meta-section">
+            <h4>Constraints</h4>
+            <div id="problemConstraints">Constraints text...</div>
+          </div>
+
+          <div id="problemExamples"></div>
+        </div>
+      </div>
+
+      <div class="workspace-card editor-panel">
+        <div class="editor-header">
+          <select class="lang-select" id="languageSelect">
+            <option value="c">C (GCC)</option>
+            <option value="cpp">C++ (GCC)</option>
+            <option value="java">Java (OpenJDK)</option>
+            <option value="python">Python 3</option>
+            <option value="javascript">JavaScript (Node.js)</option>
+          </select>
+          <button class="btn-secondary" id="runCodeBtn">Run Code</button>
+        </div>
+
+        <div class="editor-area">
+          <div id="codeHint" style="font-size:11px; color:#64748B; margin-bottom:4px;">// Write your code here</div>
+          <textarea id="codeEditor" placeholder="// Write your code here..." spellcheck="false"></textarea>
+        </div>
+
+        <div class="results-area">
+          <div class="results-title" id="runStatus">Click 'Run Code' to execute.</div>
+          <div id="resultsSummary" style="font-size:12px; font-weight:700; margin-bottom:6px;">Not run</div>
+          <div class="results-box" id="testResults"></div>
+          <div class="submit-row"><button class="btn-primary" id="submitCodingTestBtn">Submit Test</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. RESULT CARD (After Test Submission) -->
+    <div class="coding-card coding-result-card" id="codingResultCard">
+      <div class="result-header">
+        <h2>Coding Test Complete</h2>
+        <p id="codingResultMessage">Your coding test has been submitted.</p>
+      </div>
+
+      <div class="score-summary-grid">
+        <div class="summary-box">
+          <div class="summary-label">Score</div>
+          <div class="summary-value" id="codingScore">0%</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-label">Questions Solved</div>
+          <div class="summary-value" id="statSolved">0 / 0</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-label">Questions Attempted</div>
+          <div class="summary-value" id="statAttempted">0 / 0</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-label">Test Cases Passed</div>
+          <div class="summary-value" id="statCases">0 / 0</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-label">Time Spent</div>
+          <div class="summary-value" id="statTime">00:00</div>
+        </div>
+      </div>
+
+      <div class="performance-note">
+        <h4>Performance Feedback</h4>
+        <p id="codingPerformance">Review your performance above.</p>
+      </div>
+
+      <div class="start-test-bar" style="margin-top:20px;">
+        <button class="btn-primary" id="restartCodingBtn">Take Another Test</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== FULLSCREEN WARNING MODAL =============== -->
+  <div class="fs-modal-overlay" id="fsWarningOverlay">
+    <div class="fs-modal">
+      <h3>⚠️ Fullscreen Exited</h3>
+      <p id="fsWarningText">You have exited fullscreen mode. If you continue without returning to fullscreen, your exam will be submitted.</p>
+      <div class="fs-modal-actions">
+        <button class="fs-btn-primary" id="fsReturnBtn">Return to Fullscreen</button>
+        <button class="fs-btn-danger" id="fsSubmitBtn">Submit Exam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== SUBMIT CONFIRM MODAL =============== -->
+  <div class="fs-modal-overlay" id="fsConfirmOverlay">
+    <div class="fs-modal">
+      <h3>Confirm Submission</h3>
+      <p>Are you sure you want to submit? You will not be able to edit your answers after submission.</p>
+      <div class="fs-modal-actions">
+        <button class="fs-btn-secondary" id="fsConfirmCancel">Cancel</button>
+        <button class="fs-btn-danger" id="fsConfirmSubmit">Confirm Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Load Dataset -->
+  <script src="coding_dataset.js"></script>
+
+  <!-- Complete Main Script -->
+  <script>
+  (function(){
+    "use strict";
+
+    var toastEl = document.getElementById('toast');
+    var toastTimer = null;
+    function showToast(msg){
+      if(!toastEl) return;
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 3200);
+    }
+
+    /* ---------------- coding test engine ---------------- */
+    var codingData = Array.isArray(window.CRACKIT_CODING_DATA) ? window.CRACKIT_CODING_DATA : [];
+    var codingSetup = document.getElementById('codingSetup');
+    var codingWorkspace = document.getElementById('codingWorkspace');
+    var codingResultCard = document.getElementById('codingResultCard');
+    var difficultyGrid = document.getElementById('difficultyGrid');
+    var startCodingTestBtn = document.getElementById('startCodingTestBtn');
+    var codingTimeNote = document.getElementById('codingTimeNote');
+    var runCodeBtn = document.getElementById('runCodeBtn');
+    var submitCodingTestBtn = document.getElementById('submitCodingTestBtn');
+    var restartCodingBtn = document.getElementById('restartCodingBtn');
+    var codeEditor = document.getElementById('codeEditor');
+    var languageSelect = document.getElementById('languageSelect');
+    var codeHint = document.getElementById('codeHint');
+    var selectedDifficulty = null;
+    var testQuestions = [], currentQuestion = 0, answers = {}, questionResults = {};
+    var testStartedAt = 0, testDuration = 0, timerHandle = null, autoSubmitted = false;
+    var timeByDifficulty = {Easy:90*60, Medium:90*60, Hard:60*60, All:60*60};
+    var languageConfig = {
+      c:{label:'C',id:50,comment:'// Write your code here in C'},
+      cpp:{label:'C++',id:54,comment:'// Write your code here in C++'},
+      java:{label:'Java',id:62,comment:'// Write your code here in Java'},
+      python:{label:'Python',id:71,comment:'# Write your code here in Python'},
+      javascript:{label:'JavaScript',id:63,comment:'// Write your code here in JavaScript'}
+    };
+    var JUDGE0_URL='https://ce.judge0.com';
+
+    // Fullscreen Exam Mode & Proctoring State
+    var examActive = false;
+    var examSubmitted = false;
+    var fsWarningShown = false;
+
+    var fsWarningOverlay = document.getElementById('fsWarningOverlay');
+    var fsConfirmOverlay = document.getElementById('fsConfirmOverlay');
+    var fsReturnBtn = document.getElementById('fsReturnBtn');
+    var fsSubmitBtn = document.getElementById('fsSubmitBtn');
+    var fsConfirmCancel = document.getElementById('fsConfirmCancel');
+    var fsConfirmSubmit = document.getElementById('fsConfirmSubmit');
+
+    function requestFullscreen(){
+      var el = document.documentElement;
+      try {
+        if(el.requestFullscreen) el.requestFullscreen();
+        else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if(el.msRequestFullscreen) el.msRequestFullscreen();
+      } catch(e){}
+    }
+
+    function exitFullscreenBrowser(){
+      try {
+        if(document.exitFullscreen) document.exitFullscreen();
+        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if(document.msExitFullscreen) document.msExitFullscreen();
+      } catch(e){}
+    }
+
+    function isFullscreen(){
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+    }
+
+    function enterExamMode(){
+      examActive = true;
+      examSubmitted = false;
+      fsWarningShown = false;
+      document.body.classList.add('exam-mode');
+      requestFullscreen();
+    }
+
+    function exitExamMode(){
+      examActive = false;
+      document.body.classList.remove('exam-mode');
+      if(fsWarningOverlay) fsWarningOverlay.classList.remove('show');
+      if(fsConfirmOverlay) fsConfirmOverlay.classList.remove('show');
+      if(isFullscreen()) exitFullscreenBrowser();
+    }
+
+    function onFullscreenChange(){
+      if(!examActive || examSubmitted) return;
+      if(!isFullscreen()){
+        fsWarningShown = true;
+        if(fsWarningOverlay) fsWarningOverlay.classList.add('show');
+      }
+    }
+
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    document.addEventListener('msfullscreenchange', onFullscreenChange);
+
+    if(fsReturnBtn) fsReturnBtn.addEventListener('click', function(){
+      if(fsWarningOverlay) fsWarningOverlay.classList.remove('show');
+      fsWarningShown = false;
+      requestFullscreen();
+    });
+
+    if(fsSubmitBtn) fsSubmitBtn.addEventListener('click', function(){
+      if(fsWarningOverlay) fsWarningOverlay.classList.remove('show');
+      if(fsConfirmOverlay) fsConfirmOverlay.classList.add('show');
+    });
+
+    if(fsConfirmCancel) fsConfirmCancel.addEventListener('click', function(){
+      if(fsConfirmOverlay) fsConfirmOverlay.classList.remove('show');
+      if(fsWarningShown && fsWarningOverlay) fsWarningOverlay.classList.add('show');
+    });
+
+    if(fsConfirmSubmit) fsConfirmSubmit.addEventListener('click', function(){
+      if(fsConfirmOverlay) fsConfirmOverlay.classList.remove('show');
+      examSubmitted = true;
+      submitCodingTest(false);
+    });
+
+    function shuffleArray(a){
+      var copy=a.slice();
+      for(var i=copy.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=copy[i];copy[i]=copy[j];copy[j]=t;}
+      return copy;
+    }
+    function getUsedKey(diff){ return 'crackit-coding-used-' + diff.toLowerCase(); }
+    function getUsed(diff){ try{return JSON.parse(localStorage.getItem(getUsedKey(diff))||'[]');}catch(e){return [];} }
+    function setUsed(diff,ids){ try{localStorage.setItem(getUsedKey(diff),JSON.stringify(ids));}catch(e){} }
+    function chooseQuestions(diff,count){
+      var pool = diff==='All' ? codingData.slice() : codingData.filter(function(q){return q.difficulty===diff;});
+      var used = getUsed(diff);
+      var available = pool.filter(function(q){return used.indexOf(q.id)<0;});
+      if(available.length<count){ used=[]; available=pool.slice(); }
+      available=shuffleArray(available).slice(0,count);
+      setUsed(diff, used.concat(available.map(function(q){return q.id;})));
+      return available;
+    }
+    function formatTime(sec){sec=Math.max(0,Math.floor(sec));var m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+    function normalizeOutput(s){return String(s==null?'':s).replace(/\r/g,'').trim().split(/\s+/).join(' ');}
+    function setSelectedDifficulty(diff){
+      selectedDifficulty=diff;
+      document.querySelectorAll('.difficulty-option').forEach(function(b){b.classList.toggle('selected',b.dataset.difficulty===diff);});
+      codingTimeNote.textContent='Test duration: '+formatTime(timeByDifficulty[diff])+' · Questions: '+({Easy:8,Medium:5,Hard:3,All:3}[diff]);
+    }
+    difficultyGrid.querySelectorAll('.difficulty-option').forEach(function(btn){btn.addEventListener('click',function(){setSelectedDifficulty(btn.dataset.difficulty);});});
+
+    function getLanguage(){return languageConfig[languageSelect.value] || languageConfig.c;}
+    function setLanguage(lang, preserveCode){
+      if(!languageConfig[lang]) lang='c';
+      languageSelect.value=lang;
+      var cfg=getLanguage();
+      codeHint.textContent=cfg.comment;
+      var q=testQuestions[currentQuestion];
+      if(!preserveCode || !q || !answers[q.id]) codeEditor.value=cfg.comment;
+    }
+    languageSelect.addEventListener('change',function(){
+      saveCurrentAnswer();
+      setLanguage(languageSelect.value,false);
+      if(testQuestions[currentQuestion]) answers[testQuestions[currentQuestion].id]=codeEditor.value;
+    });
+
+    async function executeCode(code,inputData,expectedOutput){
+      var cfg=getLanguage();
+      var create=await fetch(JUDGE0_URL+'/submissions?base64_encoded=false&wait=false',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({source_code:code,language_id:cfg.id,stdin:inputData,expected_output:expectedOutput})
+      });
+      if(!create.ok){var text=await create.text();throw new Error('Code execution service error ('+create.status+'): '+text);}
+      var created=await create.json();
+      if(!created.token) throw new Error('The code execution service did not return a submission token.');
+      for(var attempt=0;attempt<30;attempt++){
+        await new Promise(function(resolve){setTimeout(resolve,1000);});
+        var res=await fetch(JUDGE0_URL+'/submissions/'+encodeURIComponent(created.token)+'?base64_encoded=false');
+        if(!res.ok) throw new Error('Could not get execution result ('+res.status+').');
+        var result=await res.json();
+        var statusId=result.status && result.status.id;
+        if(statusId && statusId>=3){
+          return {
+            ok:statusId===3 && normalizeOutput(result.stdout)===normalizeOutput(expectedOutput),
+            actual:result.stdout || result.stderr || result.compile_output || result.message || '',
+            expected:expectedOutput,
+            status:result.status ? result.status.description : '',
+            compileOutput:result.compile_output || ''
+          };
+        }
+      }
+      throw new Error('The code execution service took too long to respond. Please try Run Code again.');
+    }
+
+    function renderQuestion(){
+      var q=testQuestions[currentQuestion]; if(!q) return;
+      document.getElementById('questionCount').textContent='Question '+(currentQuestion+1)+' of '+testQuestions.length;
+      document.getElementById('problemTitle').textContent=q.title;
+      document.getElementById('problemDifficulty').textContent=q.difficulty;
+      document.getElementById('problemTopic').textContent=q.topic;
+      document.getElementById('problemStatement').textContent=q.statement;
+      document.getElementById('problemInput').textContent=q.input;
+      document.getElementById('problemOutput').textContent=q.output;
+      document.getElementById('problemConstraints').textContent=q.constraints;
+      var ex=document.getElementById('problemExamples'); ex.innerHTML='';
+      q.examples.forEach(function(t,i){
+        var box=document.createElement('div');box.className='example-box';
+        box.innerHTML='<b>Example '+(i+1)+'</b><code>Input:\n'+escapeHtml(t.input)+'\n\nExpected Output:\n'+escapeHtml(t.expectedOutput)+'</code>';
+        ex.appendChild(box);
+      });
+      var saved=answers[q.id];
+      codeEditor.value=saved || languageConfig[languageSelect.value].comment;
+      codeHint.textContent=languageConfig[languageSelect.value].comment;
+      document.getElementById('testResults').innerHTML='';
+      document.getElementById('resultsSummary').textContent=questionResults[q.id] ? questionResults[q.id].passed+'/'+questionResults[q.id].total+' passed' : 'Not run';
+      document.getElementById('runStatus').textContent=questionResults[q.id] ? 'Last run completed.' : 'Run your code to check the test cases.';
+      document.getElementById('prevQuestionBtn').disabled=currentQuestion===0;
+      document.getElementById('nextQuestionBtn').disabled=currentQuestion===testQuestions.length-1;
+    }
+    function escapeHtml(v){return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function saveCurrentAnswer(){ if(testQuestions[currentQuestion]) answers[testQuestions[currentQuestion].id]=codeEditor.value; }
+    function updateTimer(){
+      var left=Math.max(0,testDuration-Math.floor((Date.now()-testStartedAt)/1000));
+      var el=document.getElementById('codingTimer');el.textContent=formatTime(left);el.classList.toggle('warning',left<=60);
+      if(left<=0){clearInterval(timerHandle);submitCodingTest(true);}
+    }
+    startCodingTestBtn.addEventListener('click',function(){
+      enterExamMode();
+      if(!selectedDifficulty){showToast('Please select a difficulty level first.');return;}
+      var count={Easy:8,Medium:5,Hard:3,All:3}[selectedDifficulty];
+      testQuestions=chooseQuestions(selectedDifficulty,count);
+      if(!testQuestions.length){showToast('No coding questions are available.');return;}
+      currentQuestion=0;answers={};questionResults={};autoSubmitted=false;setLanguage(languageSelect.value,false);
+      testDuration=timeByDifficulty[selectedDifficulty];testStartedAt=Date.now();
+      codingSetup.style.display='none';codingResultCard.classList.remove('active');codingWorkspace.classList.add('active');
+      renderQuestion();updateTimer();clearInterval(timerHandle);timerHandle=setInterval(updateTimer,1000);
+    });
+    document.getElementById('prevQuestionBtn').addEventListener('click',function(){saveCurrentAnswer();if(currentQuestion>0){currentQuestion--;renderQuestion();}});
+    document.getElementById('nextQuestionBtn').addEventListener('click',function(){saveCurrentAnswer();if(currentQuestion<testQuestions.length-1){currentQuestion++;renderQuestion();}});
+    codeEditor.addEventListener('input',function(){if(testQuestions[currentQuestion])answers[testQuestions[currentQuestion].id]=codeEditor.value;});
+    runCodeBtn.addEventListener('click',async function(){
+      saveCurrentAnswer();var q=testQuestions[currentQuestion];if(!q)return;
+      var code=codeEditor.value.trim();if(!code){showToast('Write your code before running it.');return;}
+      runCodeBtn.disabled=true;document.getElementById('runStatus').textContent='Running '+getLanguage().label+' and checking test cases…';
+      var container=document.getElementById('testResults');container.innerHTML='';
+      try{
+        var passed=0,items=[];
+        for(var i=0;i<q.testCases.length;i++){
+          var t=q.testCases[i];
+          var result=await executeCode(code,t.input,t.expectedOutput);
+          if(result.ok)passed++;
+          items.push(result);
+        }
+        questionResults[q.id]={passed:passed,total:q.testCases.length,allPassed:passed===q.testCases.length};
+        document.getElementById('resultsSummary').textContent=passed+'/'+q.testCases.length+' passed';
+        document.getElementById('runStatus').textContent=passed===q.testCases.length?'All test cases passed ✓':'Some test cases failed';
+        items.forEach(function(item,idx){
+          var row=document.createElement('div');row.className='result-item '+(item.ok?'result-pass':'result-fail');
+          row.innerHTML='<b>Test Case '+(idx+1)+': '+(item.ok?'PASSED ✓':'FAILED ✕')+'</b>'+(item.ok?'':'<div class="result-detail">Status: '+escapeHtml(item.status||'Failed')+'\n\nExpected:\n'+escapeHtml(item.expected)+'\n\nYour Output / Error:\n'+escapeHtml(item.actual)+'</div>');
+          container.appendChild(row);
+        });
+      }catch(err){
+        document.getElementById('runStatus').textContent='Execution error';
+        container.innerHTML='<div class="result-item result-fail"><b>Could not execute the code.</b><div class="result-detail">'+escapeHtml(err.message||err)+'</div></div>';
+      }finally{runCodeBtn.disabled=false;}
+    });
+    function submitCodingTest(fromTimer){
+      examSubmitted = true;
+      if(!testQuestions.length)return;
+      saveCurrentAnswer();clearInterval(timerHandle);autoSubmitted=!!fromTimer;
+      var solved=0,attempted=0,passedCases=0,totalCases=0;
+      testQuestions.forEach(function(q){
+        var r=questionResults[q.id];totalCases+=q.testCases.length;
+        if(r){passedCases+=r.passed;if(r.passed>0)attempted++;if(r.allPassed)solved++;}
+        else if((answers[q.id]||'').trim() && (answers[q.id]||'').trim()!=='# Write your solution here') attempted++;
+      });
+      var score=Math.round((solved/testQuestions.length)*100);
+      var used=Math.min(testDuration,Math.floor((Date.now()-testStartedAt)/1000));
+      document.getElementById('codingScore').textContent=score+'%';
+      document.getElementById('statSolved').textContent=solved+' / '+testQuestions.length;
+      document.getElementById('statAttempted').textContent=attempted+' / '+testQuestions.length;
+      document.getElementById('statCases').textContent=passedCases+' / '+totalCases;
+      document.getElementById('statTime').textContent=formatTime(used);
+      document.getElementById('codingResultMessage').textContent=fromTimer?'Time is up. Your coding test was submitted automatically.':'Your coding test has been submitted.';
+      document.getElementById('codingPerformance').textContent=score>=80?'Strong performance. Keep practicing harder problems and focus on consistency.':score>=50?'Good attempt. Review the failed test cases and practice the weaker topics.':'Keep practicing. Focus on understanding constraints, edge cases and algorithm selection.';
+      codingWorkspace.classList.remove('active');codingResultCard.classList.add('active');codingSetup.style.display='none';
+      showToast(fromTimer?'Time is up — test submitted automatically.':'Coding test submitted.');
+      exitExamMode();
+    }
+    submitCodingTestBtn.addEventListener('click',function(){
+      if(!testQuestions.length)return;
+      if(fsConfirmOverlay) fsConfirmOverlay.classList.add('show');
+    });
+    restartCodingBtn.addEventListener('click',function(){
+      exitExamMode();codingResultCard.classList.remove('active');codingWorkspace.classList.remove('active');codingSetup.style.display='block';selectedDifficulty=null;document.querySelectorAll('.difficulty-option').forEach(function(b){b.classList.remove('selected');});codingTimeNote.textContent='Select a level to see the test duration.';setLanguage('c',false);});
+
+  })();
+  </script>
+</body>
+</html>
